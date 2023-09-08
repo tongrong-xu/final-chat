@@ -1,0 +1,17 @@
+{
+    "routes": [
+        {
+            "src": "/api/*",
+            "dest": "app.js"
+          },
+      {
+        "src": "/api/home",
+        "dest": "/routes/UserRoute.js"
+      },
+      {
+        "src": "/api//home/rooms",
+        "dest": "/routes/RoomRoute.js"
+      }
+    ]
+  }
+  
