@@ -1,0 +1,173 @@
+*{
+    margin: 0;
+    
+}
+h1{
+    font-weight: 800;
+}
+h3{
+    font-weight: 600;
+}
+.bg{
+    background-color: rgb(82, 197, 153);
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+}
+main{
+    position: absolute;
+    padding: 10vh 15vw;
+    display: flex;
+    /* width: 70%; */
+    /* height: 80vh; */
+    width: 100%;
+    height: 100vh;
+    background-color: transparent;
+    pointer-events: none;
+}
+.student-login{
+    width: 40%;
+    height: 100%;
+    margin-right: 20%;
+    border: 3px solid rgb(85, 46, 14 , 0.8);
+    border-radius: 30px;
+    background-color: #FFDB7D;
+    transition: all 0.5s;
+    pointer-events:all;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.teacher-login{
+    width: 40%;
+    height: 100%;
+    border: 3px solid rgb(85, 46, 14 , 0.8);
+    border-radius: 30px;
+    background-color:rgb(159, 236, 255);
+    transition: all 0.5s;
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.content{
+    /* width: calc(100% - 100px);
+    height: calc(100% - 140px); */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    /* flex-direction: column; */
+    /* align-items: center; */
+    transition: all 0.5s;
+}
+.zoom-out{
+    width: 20%;
+    height: 35%;
+    /* aspect-ratio: 1 / 1; */
+
+}
+
+.zoom-in{
+    width: 60%;
+    height: 100%;
+}
+.avater{
+    height: 20vh;
+    width: 20vh;
+    border-radius: 50%;
+    background-color: black;
+}
+.information{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    transition: all 0.5s;
+}
+.log-in-form{
+    width: 50%;
+    padding: 20px;
+}
+.introduce{
+    margin-top: 20px;
+}
+.theForm{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    background-color: white;
+    border: 1px solid black;
+    /* border-top: 0px; */
+    border-radius: 0px 0px 15px 15px;
+}
+input{
+    margin-top: 20px;
+    width: 100%;
+    border-radius: 10px;
+    padding-left: 10px;
+    height: 35px;
+    border-color: rgb(0, 0, 0 ,0.6);
+    border-style: solid;
+    border-width: 2px;
+}
+#log-in-home-tab-active{
+    border-color: black black #FFF0C8;
+    border-radius: 15px 15px 0 0;
+    transform: translate(0,1px);
+    background-color: #FFF0C8;
+}
+#log-in-home-tab-non{
+    border-color: black black transparent;
+    background-color: rgb(106, 66, 29 , 0.8);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+#sign-up-profile-tab-active{
+    border-color: black black #FFF0C8;
+    border-radius: 15px 15px 0 0;
+    transform: translate(0,1px);
+    background-color: #FFF0C8;
+}
+#sign-up-profile-tab-non{
+    border-color: black black transparent;
+    background-color: rgb(106, 66, 29 , 0.8);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+#log-in-home-tab2-active{
+    border-color: black black #E0F4FF;
+    border-radius: 15px 15px 0 0;
+    transform: translate(0,1px);
+    background-color: #E0F4FF;
+}
+#log-in-home-tab2-non{
+    border-color: black black transparent;
+    background-color: rgb(19, 78, 111 ,0.8);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+#sign-up-profile-tab2-active{
+    border-color: black black #E0F4FF;
+    border-radius: 15px 15px 0 0;
+    transform: translate(0,1px);
+    background-color: #E0F4FF;
+}
+#sign-up-profile-tab2-non{
+    border-color: black black transparent;
+    background-color: rgb(19, 78, 111 ,0.8);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+.index-btn{
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 5px 15px;
+    width: 100px;
+    font-size: 22px;
+    color: white;
+    font-weight: 600;
+}

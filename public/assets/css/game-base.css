@@ -1,0 +1,139 @@
+*{
+    margin: 0;
+    box-sizing: border-box;
+}
+canvas{
+    overflow: hidden; 
+    width: 100%;
+    height: 100%;
+    background-color: #bb9478;
+    z-index: -1;
+    position: absolute;
+}
+div{
+    /* position:absolute; */
+    /* opacity: 0.4; */
+    opacity: 1;
+}
+.row{
+    width: 100%;
+    height: 100%;   
+    --bs-gutter-x:0;
+    --bs-gutter-y:0;
+}
+
+.btn{
+    background-color: #30705D;
+    border: 10px solid yellow;
+    height: 50px;
+    border-radius: 50px;
+    margin-right: 20px;
+    font-size: 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 設定視窗 */
+.setting-con{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(43, 18, 18 , 0.3);
+    z-index: 20;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.setting-board{
+    position: fixed;
+    width: 35vw;
+    height: 30vh;
+    background-color: blanchedalmond;
+    z-index: 30;
+    box-sizing: border-box;
+    border: 10px solid #6e4b32;
+    border-radius: 20px;
+    transform: translate(0, -5vh);
+    padding: 30px 15px;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    /* flex-wrap: wrap; */
+}
+.setting-btn{
+    margin: 0 30px;
+    height: 25%;
+    border-radius: 20px;
+    background-color: #bb9478;
+    color: white;
+    font-size: 24px;
+}
+#setting-open-btn:hover{
+    filter: brightness(0.9);
+}
+
+/* 出題視窗 */
+.make-quetion-con{
+    position: fixed;
+    width: 40vw;
+    height: 50vh;
+    right: calc((100vw - 40vw) / 2);
+    top: calc((100vh - 50vh) / 2 - 5vh);
+    background-color: #FFD25D;
+    border: 10px solid #FFD25D;
+    border-radius: 25px;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 2px 5px rgb(0, 0, 0 , 0.4);
+}
+.make-quetion{
+    width: 100%;
+    height: 100%;
+    background-color: #9E785D;
+    z-index: 30;
+    box-sizing: border-box;
+    border: 10px solid #6e4b32;
+    border-radius: 20px;
+    padding: 25px 15px;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    flex-direction: column;
+}
+#question-textarea{
+    font-size: 24px;
+    padding: 10px;
+    border-radius: 20px;
+    margin: 0px 20px;
+    background-color: blanchedalmond;
+    width: calc(100% - 40px);
+}
+.qus-opation{
+    scale: 3;
+    transform: translate(5px,0);
+    margin-right: 30px;
+    background-color: blanchedalmond;
+}
+.qus-opation-name{
+    width: calc(100% - 50px);
+    border-radius: 20px;
+    border-style: solid;
+    /* border-color: ; */
+    background-color: blanchedalmond;
+    /* height: 20px; */
+    font-size: 24px;
+    padding: 0px 20px;
+}
+#make-qus-btn{
+    margin: 0px;
+    margin-bottom: 0;
+    width: calc(40% - 40px);
+    height: 90%;
+    font-weight: 600;
+    font-size: 28px;
+}

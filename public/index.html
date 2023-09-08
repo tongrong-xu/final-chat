@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>彈幕化遊戲-登入</title>
+    <meta name="version" content="0.40">
+
+    <link rel="stylesheet" href="./assets/css/suite/bootstrap.min.css">
+
+    <script src="./assets/js/suite/jquery.min.js"></script>
+    <script src="./assets/js/suite/jquery-ui.js"></script>
+    <script src="./assets/js/suite/bootstrap.min.js"></script>
+
+    <script src="./assets/js/logIn.js"></script>
+
+
+    <style>
+        * {
+            margin: 0;
+
+        }
+
+        .bg {
+            background-color: rgb(82, 197, 153);
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+        }
+
+        main {
+            position: absolute;
+            padding: 10vh 15vw;
+            display: flex;
+            /* width: 70%; */
+            /* height: 80vh; */
+            width: 100%;
+            height: 100vh;
+            background-color: transparent;
+            pointer-events: none;
+        }
+
+        .student-login {
+            width: 40%;
+            height: 100%;
+            margin-right: 20%;
+            border: 1px solid;
+            border-radius: 30px;
+            background-color: rgb(255, 253, 152);
+            transition: all 0.5s;
+            pointer-events: all;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .teacher-login {
+            width: 40%;
+            height: 100%;
+            border: 1px solid;
+            border-radius: 30px;
+            background-color: rgb(159, 236, 255);
+            transition: all 0.5s;
+            pointer-events: all;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content {
+            /* width: calc(100% - 100px);
+            height: calc(100% - 140px); */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            /* flex-direction: column; */
+            /* align-items: center; */
+            transition: all 0.5s;
+        }
+
+        .zoom-out {
+            width: 20%;
+            height: 35%;
+            /* aspect-ratio: 1 / 1; */
+
+        }
+
+        .zoom-in {
+            width: 60%;
+            height: 100%;
+        }
+
+        .avater {
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            background-color: black;
+        }
+
+        .information {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+            transition: all 0.5s;
+        }
+
+        .log-in-form {
+            width: 50%;
+            padding: 20px;
+        }
+
+        .introduce {
+            margin-top: 20px;
+        }
+
+        .theForm {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-top: 0px;
+            border-radius: 0px 0px 15px 15px;
+        }
+
+        input {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 10px;
+            padding-left: 10px;
+            height: 35px;
+        }
+    </style>
+
+    <script>
+
+    </script>
+</head>
+
+<body>
+    <div class="bg"></div>
+    <main>
+        <div class="student-login">
+            <div class="content" style="padding: 70px 50px;">
+                <div class="information">
+                    <div class="avater">
+
+                    </div>
+                    <div class="introduce">
+                        <h1>我是學生</h1>
+                        <hr style="border-top: 2px solid black;">
+                        <div>
+                            <h3>‧ 參與作答</h3>
+                            <h3>‧ 查看作答紀錄</h3>
+                            <h3>‧ 購買外觀特效</h3>
+                            <h3>‧ 排行版</h3>
+                            <h3>‧ 聊天室</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="log-in-form" style="display: none;">
+                    <!-- <div style="display: flex;justify-content: space-between;">
+                        <div class="lig-in-page">登入</div>
+                        <div class="sign-in-page">註冊</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; flex-direction: column;">
+                        <form action="" method="post">
+
+                        </form>
+                    </div> -->
+                    <nav>
+                        <div class="nav nav-tabs justify-content-between" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="log-in-home-tab" data-bs-toggle="tab"
+                                data-bs-target="#log-in-home" type="button" role="tab" aria-controls="log-in-home"
+                                aria-selected="true">
+                                <h2>登入</h2>
+                            </button>
+                            <button class="nav-link" id="sign-up-profile-tab" data-bs-toggle="tab"
+                                data-bs-target="#sign-up-profile" type="button" role="tab"
+                                aria-controls="sign-up-profile" aria-selected="false">
+                                <h2>註冊</h2>
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="log-in-home" role="tabpanel"
+                            aria-labelledby="log-in-home-tab">
+                            <form action="/loginstudent" method="post" class="theForm">
+                                <input type="text" name="email" id="" placeholder="請輸入電子郵件" required>
+                                <input type="password" name="password" id="" placeholder="請輸入密碼" required>
+                                <button type="submit"
+                                    style="margin-top: 20px;border-radius: 10px;padding: 5px;width: 70px;">送出</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="sign-up-profile" role="tabpanel"
+                            aria-labelledby="sign-up-profile-tab">
+                            <form action="/registerstudent" method="post" class="theForm">
+                                <input type="text" name="username" id="" placeholder="使用者名稱" required>
+                                <input type="email" name="email" id="" placeholder="請輸入電子郵件" required>
+                                <input type="password" name="password" id="" placeholder="輸入密碼" required>
+                                <input type="password" name="re-password" id="" placeholder="確認密碼" required>
+                                <button type="submit"
+                                    style="margin-top: 20px;border-radius: 10px;padding: 5px;width: 70px;">送出</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="teacher-login">
+            <div class="content" style="padding: 70px 50px;">
+                <div class="log-in-form" style="display: none;">
+                    <nav>
+                        <div class="nav nav-tabs justify-content-between" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="log-in-home-tab2" data-bs-toggle="tab"
+                                data-bs-target="#log-in-home2" type="button" role="tab" aria-controls="log-in-home2"
+                                aria-selected="true">
+                                <h2>登入</h2>
+                            </button>
+                            <button class="nav-link" id="sign-up-profile-tab2" data-bs-toggle="tab"
+                                data-bs-target="#sign-up-profile2" type="button" role="tab"
+                                aria-controls="sign-up-profile2" aria-selected="false">
+                                <h2>註冊</h2>
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="log-in-home2" role="tabpanel"
+                            aria-labelledby="log-in-home-tab2">
+                            <form action="/loginteacher" method="post" class="theForm">
+                                <input type="text" name="email" id="" placeholder="請輸入電子郵件" required>
+                                <input type="password" name="password" id="" placeholder="請輸入密碼" required>
+                                <button type="submit"
+                                    style="margin-top: 20px;border-radius: 10px;padding: 5px;width: 70px;">送出</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="sign-up-profile2" role="tabpanel"
+                            aria-labelledby="sign-up-profile-tab2">
+                            <form action="/registerteacher" method="post" class="theForm">
+                                <input type="text" name="username" id="" placeholder="請輸入使用者名稱" required>
+                                <input type="email" name="email" id="" placeholder="請輸入電子郵件" required>
+                                <input type="password" name="password" id="" placeholder="輸入密碼" required>
+                                <input type="password" name="re-password" id="" placeholder="確認密碼" required>
+                                <button type="submit"
+                                    style="margin-top: 20px;border-radius: 10px;padding: 5px;width: 70px;">送出</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="information">
+                    <div class="avater">
+
+                    </div>
+                    <div class="introduce">
+                        <h1>我是老師</h1>
+                        <hr style="border-top: 2px solid black;">
+                        <div>
+                            <h3>‧ 參與作答</h3>
+                            <h3>‧ 查看學生資料</h3>
+                            <h3>‧ 查看作答紀錄</h3>
+                            <h3>‧ 出題權限</h3>
+                            <h3>‧ 排行榜</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on('connection', function () {
+            console.log('A user connected');
+        })
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+
+        if (message === 'Email already') {
+            window.alert("重複註冊");
+            window.location.href = "/";
+        } else if (message === 'Email pass') {
+            window.alert("通過註冊");
+            window.location.href = "/";
+        } else if (message === 'Email NG') {
+            window.alert("登入錯誤");
+            window.location.href = "/";
+        } 
+    </script>
+
+</body>
+
+</html>

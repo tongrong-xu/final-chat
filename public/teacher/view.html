@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件</title>
+</head>
+
+<body>
+    <h1>
+        觀看清單
+    </h1>
+    <div id="usernames"></div>
+
+    <div id="viewlist"></div>
+
+    <a href="/logout"><span>登出</span></a>
+    <form action="./game.html" method="" class="theForm">
+        <button type="submit" style="margin-top: 20px;border-radius: 10px;padding: 5px;width: 70px;">送出</button>
+    </form>
+</body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    const connect = 'connect';
+
+    const usernameElement = document.getElementById('usernames');
+    const viewlistElement = document.getElementById('viewlist');
+    socket.on('connect', function () {
+        console.log(connect);
+        viewlistElement.textContent = '未創建';
+    })
+
+    socket.on('username', (name) => {
+        if (name) {
+            usernameElement.textContent = "使用者 :" + name;
+        } else {
+            usernameElement.textContent = '未登入 ';
+        }
+    });
+
+    socket.on('viewcode', (roomCodes) => {
+        viewlistElement.textContent = '';
+        roomCodes.forEach(item => {
+            const itemElement = document.createElement('p');
+            // 創建房間代碼連結
+            const linkElement = document.createElement('a');
+            linkElement.textContent = item;
+            linkElement.href = `./RoomID_${item}`; // 根據路由設定連結
+
+            // 將連結添加到段落元素中
+            itemElement.appendChild(linkElement);
+
+            // 將段落元素添加到 viewlistElement 中
+            viewlistElement.appendChild(itemElement);
+        });
+    });
+</script>
+
+</html>
