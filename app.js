@@ -39,12 +39,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(
-  cors({
-    origin: ["http://localhost:3000", process.env.ORIGIN],
-  })
-);
-
 app.set('socketio', io);
 app.use('/', UserRoute);
 server.listen(3000, () => console.log("Server started on port"));
