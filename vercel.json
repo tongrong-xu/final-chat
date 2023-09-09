@@ -1,17 +1,10 @@
 {
-    "routes": [
-        {
-            "src": "/api/*",
-            "dest": "app.js"
-          },
-      {
-        "src": "/api/home",
-        "dest": "/routes/UserRoute.js"
-      },
-      {
-        "src": "/api//home/rooms",
-        "dest": "/routes/RoomRoute.js"
-      }
-    ]
-  }
-  
+  "routes": [
+    { "src": "^/static/(.*)", "dest": "/public/$1" },
+    { "src": "/api/(.*)", "dest": "/app.js" },
+    { "src": "/room/Room_([a-zA-Z0-9_-]+)", "dest": "/app.js" },
+    { "src": "/room/joinClassroom", "dest": "/app.js" },
+    { "src": "/room/GoChat", "dest": "/app.js" },
+    { "src": "/(.*)", "dest": "/app.js" }
+  ]
+}
