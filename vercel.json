@@ -5,6 +5,12 @@
     { "src": "/room/Room_([a-zA-Z0-9_-]+)", "dest": "/app.js" },
     { "src": "/room/joinClassroom", "dest": "/app.js" },
     { "src": "/room/GoChat", "dest": "/app.js" },
+    { "src": "/loginstudent", "dest": "/app.js" },
+    { "src": "/registerstudent", "dest": "/app.js" },
+    { "src": "/loginteacher", "dest": "/app.js" },
+    { "src": "/registerteacher", "dest": "/app.js" },
+    { "src": "/logout", "dest": "/app.js" },
+    { "src": "/home", "dest": "/app.js" },
     { "src": "/(.*)", "dest": "/app.js" }
   ]
 }
