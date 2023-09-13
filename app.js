@@ -22,9 +22,8 @@ mongoose
 
 const app = express();
 const server = http.createServer(app);
-
 const io = socketIOServer(server);
-
+app.set('socketio', io);
 app.use(session({
   secret: 'cai39kf299fk03k0f29',
   resave: false,
@@ -37,8 +36,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.set('socketio', io);
 app.use('/', UserRoute);
 server.listen(4000, () => console.log("Server started on port"));
 

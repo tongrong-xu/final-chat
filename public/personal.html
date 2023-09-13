@@ -46,8 +46,10 @@
                         <h1 id="username"></h1>
                         <h4 style="font-weight: 400;" id="userLv"></h4>
                     </div>
-                    <div class="account-type">
+                    <div class="account-type" style="display: flex;">
                         <h4 style="font-weight: 600;" id="userrole"></h4>
+                        <a href="/home/rooms/topic" id="topic"
+                            style="margin: 5px 30px;font-size: 24px;text-decoration: none; display: none;">管理題目</a>
                     </div>
                 </div>
             </div>
@@ -115,16 +117,11 @@
                     <div class="create-room-con" style="display: none;">
                         <div style="display: flex;flex-direction: column;padding: 20px;">
                             <form action="/home/rooms" method="post">
-                                <!-- <label>
-                                    <input type="radio" name="room-type" id="class">全班房間
-                                </label>
                                 <label>
-                                    <input type="radio" name="room-type" id="team">小組房間
+                                    <input type="radio" name="room-type" value="public" id="public" checked
+                                        required>公開房間
+                                    <input type="radio" name="room-type" value="team" id="team">私人房間
                                 </label>
-                                <label>
-                                    <input type="radio" name="room-type" id="personal">個人房間
-                                </label>
-                                -->
                                 <input type="text" placeholder="輸入房間名稱" name="roomname">
                                 <button type="submit">創建房間</button>
 
@@ -173,6 +170,7 @@
     const userLvElement = document.getElementById('userLv');
     const userroleElement = document.getElementById('userrole');
     const roomInfoElement = document.getElementById('can-join-room-con');
+    const topicElement = document.getElementById('topic');
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -181,7 +179,7 @@
         const day = date.getDate().toString().padStart(2, '0');
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${year}-${month}-${day} ${hours}:${minutes}`;
+        return `${month}-${day}`;
     }
 
     // Socket.IO 連接
@@ -197,23 +195,67 @@
     });
 
     // 更新用戶名稱
-    socket.on('username', (name) => {
+    socket.on('homename', (name) => {
         socketname = name
         socket.emit('login', name)
         usernameElement.textContent = name ? name : 'name is unknown';
     });
 
     // 更新用戶等級
-    socket.on('level', (Lv) => {
+    socket.on('homelevel', (Lv) => {
         socketLv = Lv
         userLvElement.textContent = Lv ? 'Lv.' + Lv : 'Lv is unknown';
     });
 
     // 更新用戶角色
-    socket.on('role', (role) => {
+    socket.on('homerole', (role) => {
         socketrole = role
         const roleText = role === 'student' ? '學生' : role === 'teacher' ? '教師' : 'role is unknown';
         userroleElement.textContent = roleText;
+        if (role === 'teacher') {
+            topicElement.style.display = "block";
+        }
+    });
+
+    socket.on('newpublic', (newpublic) => {
+        const roomElement = document.createElement('div');
+        roomElement.className = 'col row align-items-center room-board-con canJoinRoom';
+        roomElement.innerHTML = `
+        <div class="col-2 room-type">${newpublic.state}</div>
+        <div class="col-3 room-id" room-id="${newpublic.RoomCode}">ID:${newpublic.RoomCode}</div>
+        <div class="col-3 room-type">${newpublic.RoomName}</div>
+        <div class="col-2 room-qus-type">${newpublic.MasterName}</div>
+        <div class="col-2 room-people">${formatDate(newpublic.expirationDate)}</div>
+    `;
+
+        const hrElement = document.createElement('hr');
+        hrElement.style.margin = '0';
+
+        // 將 hrElement 附加到 roomElement 內部
+        roomInfoElement.prepend(roomElement);
+        roomElement.appendChild(hrElement);
+        roomElement.addEventListener('click', async () => {
+            try {
+                const roomCode = roomElement.querySelector('.room-id').getAttribute('room-id');
+                const requestData = { roomCode: roomCode };
+                const requestBody = JSON.stringify(requestData);
+
+                const response = await fetch('home/rooms/GoChat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // 设置请求头
+                    },
+                    body: requestBody
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                window.location.href = `/home/rooms/Room_${roomCode}`;
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        });
     });
 
     // 處理獲取房間信息並顯示到前端
@@ -224,10 +266,11 @@
             const roomElement = document.createElement('div');
             roomElement.className = 'col row align-items-center room-board-con canJoinRoom';
             roomElement.innerHTML = `
+                <div class="col-2 room-type">${room.state}</div>
                 <div class="col-3 room-id" room-id="${room.RoomCode}">ID:${room.RoomCode}</div>
                 <div class="col-3 room-type">${room.RoomName}</div>
-                <div class="col-3 room-qus-type">${room.teacehr}</div>
-                <div class="col-3 room-people">${formatDate(room.LastUpdatedAt)}</div>
+                <div class="col-2 room-qus-type">${room.teacehr}</div>
+                <div class="col-2 room-people">${formatDate(room.LastUpdatedAt)}</div>
             `;
             roomInfoElement.appendChild(roomElement);
             const hrElement = document.createElement('hr');
@@ -256,8 +299,6 @@
                 } catch (error) {
                     console.error('Fetch error:', error);
                 }
-
-                window.location.href = `/home/rooms/Room_${roomCode}`;
             });
         });
     });

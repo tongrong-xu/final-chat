@@ -1,9 +1,10 @@
+//usercontroller.js
 const student = require("../models/student");
 const teacher = require("../models/teacher");
 const Room = require("../models/room");
 const bcrypt = require("bcrypt");
 const path = require('path');
-const socket = require('../socket');
+const sockets = require('../socket');
 
 // 學生登入處理函式
 const loginstudent = async (req, res) => {
@@ -138,57 +139,87 @@ const registerteacher = async (req, res) => {
 // 首頁處理函式
 const home = async (req, res) => {
     try {
-
+        const role = req.session.user.role;
+        const Lv = req.session.user.Lv;
+        const Name = req.session.user.name;
+        sockets.HomeName(Name);
+        sockets.Homerole(role);
+        sockets.HomeLv(Lv);
         const HtmlPath = path.join(__dirname, '..', 'public', 'personal.html');
         if (req.session.user) {
             //console.log(req.session.user)
-            const role = req.session.user.role;
-            const Lv = req.session.user.Lv;
-            const Name = req.session.user.name;
             if (role === 'student') {
                 const roomQuery = {
                     $or: [{
                         Menber: Name
                     }, {
                         MasterName: Name
+                    }],
+                    $and: [{
+                        state: 'team'
                     }]
                 };
                 const rooms = await Room.find(roomQuery);
-                const roomInfo = rooms.map(room => {
+                const PublicRoom = await Room.find({
+                    state: 'public'
+                });
+                const PublicInfo = PublicRoom.map(room => {
                     return {
+                        state: room.state,
                         RoomCode: room.RoomCode,
                         RoomName: room.RoomName,
                         teacehr: room.MasterName,
                         LastUpdatedAt: room.updatedAt
                     };
                 });
-                socket.setUserName(Name);
-                socket.setUserrole(role);
-                socket.setUserLv(Lv);
-                socket.ViewRoomCode(roomInfo);
-                const io = req.app.get('socketio'); // 獲取 Socket.io 實例
-                io.emit('updateRooms', roomInfo);
+
+                const roomInfo = rooms.map(room => {
+                    return {
+                        state: room.state,
+                        RoomCode: room.RoomCode,
+                        RoomName: room.RoomName,
+                        teacehr: room.MasterName,
+                        LastUpdatedAt: room.updatedAt
+                    };
+                });
+
+                const combinedInfo = PublicInfo.concat(roomInfo);
+                sockets.ViewRoomCode(combinedInfo);
             } else if (role === 'teacher') {
                 const roomQuery = {
                     $or: [{
                         Menber: Name
                     }, {
                         MasterName: Name
+                    }],
+                    $and: [{
+                        state: 'team'
                     }]
                 };
                 const rooms = await Room.find(roomQuery);
-                const roomInfo = rooms.map(room => {
+                const PublicRoom = await Room.find({
+                    state: 'public'
+                });
+                const PublicInfo = PublicRoom.map(room => {
                     return {
+                        state: room.state,
                         RoomCode: room.RoomCode,
                         RoomName: room.RoomName,
                         teacehr: room.MasterName,
                         LastUpdatedAt: room.updatedAt
                     };
                 });
-                socket.setUserName(Name);
-                socket.setUserrole(role);
-                socket.setUserLv(Lv);
-                socket.ViewRoomCode(roomInfo);
+                const roomInfo = rooms.map(room => {
+                    return {
+                        state: room.state,
+                        RoomCode: room.RoomCode,
+                        RoomName: room.RoomName,
+                        teacehr: room.MasterName,
+                        LastUpdatedAt: room.updatedAt
+                    };
+                });
+                const combinedInfo = PublicInfo.concat(roomInfo);
+                sockets.ViewRoomCode(combinedInfo);
             } else {
                 res.redirect('/');
             }

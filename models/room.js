@@ -13,9 +13,16 @@ const RoomSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    state: {
+        type: String,
+        required: true
+    },
     Menber: [{
         type: String
-    }]
+    }],
+    expirationDate: {
+        type: Date // 用來儲存房間的有效期
+    }
 }, {
     timestamps: true // 自動添加 createdAt 和 updatedAt 欄位
 });

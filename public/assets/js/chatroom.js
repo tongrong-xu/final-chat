@@ -10,7 +10,7 @@ $(document).ready(function () {
     const connect = 'connect';
     let needchat = 10;
     let isScrolling = false;
-
+    //let roommyname = ''
     const usernameElement = document.getElementById('username');
     const userLvElement = document.getElementById('userLv');
     const memberListContainer = document.getElementById('members-con');
@@ -23,8 +23,15 @@ $(document).ready(function () {
     memberListContainer.innerHTML = ''
 
     socket.on('connect', function () {
+        usernameElement.textContent = ''
         console.log(connect)
         socket.emit('entercode', cleanRoomCode)
+        //socket.on('myuser', (name) => {
+        //roommyname = name
+        //console.log('usernamefront', name);
+        //console.log('roommyname', roommyname);
+        // });
+
         socket.on('myname', (name) => {
             if (name) {
                 usernameElement.textContent = name;
@@ -37,25 +44,13 @@ $(document).ready(function () {
                     color: "white",
                     type: 0
                 };
-
+                // ---------以下function-------------
                 //enter執行送出
                 $("#message-input").keyup(function (event) {
                     if (event.which === 13) {
                         messageSendBtn.click(); //觸發發送訊息
                     }
                 });
-
-                socket.on('enter', (data) => {
-                    const text = data + ' is join'
-                    createBarrage(text, "black", 0);
-                })
-                socket.on('out', (data) => {
-                    const text = data + ' is leave'
-                    createBarrage(text, "black", 0);
-                })
-
-                // ---------以下function-------------
-
 
                 messageSendBtn.click(function () {
                     messageObj["message"] = messageInput.val();
@@ -76,18 +71,18 @@ $(document).ready(function () {
                     var messageDivString = messageDiv.html();
                     if (name == data.username) {
                         var $msg = `
-        <div class="col row message-username-self-con" id="message-con">
-            <div class="col-3 message-username-self">${data.username}</div>
-            <div class="col-9 message-time">${data.time}</div>
-            ${messageDivString}
-        </div>
-        <hr>`;
+                    <div class="col row message-username-self-con" id="message-con">
+                    <div class="col-3 message-username-self">${data.username}</div>
+                    <div class="col-9 message-time">${data.time}</div>
+                    ${messageDivString}
+                    </div>
+                    <hr>`;
                     } else {
                         var $msg = `
                         <div class="col row " >
-                            <div class="col-3 message-username">${data.username}</div>
-                            <div class="col-9 message-time">${data.time}</div>
-                            ${messageDivString}
+                        <div class="col-3 message-username">${data.username}</div>
+                        <div class="col-9 message-time">${data.time}</div>
+                        ${messageDivString}
                         </div>
                         <hr>`;
                     }
@@ -200,6 +195,18 @@ $(document).ready(function () {
 
                 //-------------------彈幕---------------------
 
+                socket.on('enter', (data) => {
+                    const text = data + ' is join'
+                    createBarrage(text, "black", 0);
+                })
+                socket.on('overtime', (data) => {
+                    const text = data
+                    createBarrage(text, "black", 0);
+                })
+                socket.on('out', (data) => {
+                    const text = data + ' is leave'
+                    createBarrage(text, "black", 0);
+                })
                 //建立彈幕
                 function createBarrage(text, color = "black", type = 0) {
                     // 創建彈幕元素
@@ -359,6 +366,7 @@ $(document).ready(function () {
                 usernameElement.textContent = 'name is unknow';
             }
         });
+
         socket.on('mylv', (Lv) => {
             if (Lv) {
                 userLvElement.textContent = 'Lv.' + Lv;
@@ -367,7 +375,6 @@ $(document).ready(function () {
             }
         });
         socket.on('disconnect', function () {
-            socket.to(cleanRoomCode).emit('signout')
             window.location.href = `/home`;
         });
     });
@@ -376,7 +383,6 @@ $(document).ready(function () {
     leaveroom.click(function () {
         window.location.href = `/home`;
     })
-
 
     function scrollMessage() {
         chatroomCon.scrollTop(chatroomCon[0].scrollHeight);
