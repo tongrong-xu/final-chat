@@ -1,5 +1,7 @@
 //roomcontroller.js
 const Room = require("../models/room");
+const Questionbank = require("../models/Questionbank");
+const topicans = require("../models/topic");
 const path = require('path');
 const {
     generateRoomCode
@@ -124,7 +126,6 @@ const GoChat = async (req, res) => {
             RoomCode: roomCode
         });
         const studentName = req.session.user.name;
-        console.log('me', studentName)
         if (!room.Menber.includes(studentName)) {
             room.Menber.push(studentName);
             await room.save();
@@ -135,22 +136,120 @@ const GoChat = async (req, res) => {
     }
 }
 
-const topic = (req, res) => {
+const topic = async (req, res) => {
     try {
         const userData = req.session.user;
-        const topicPath = path.join(__dirname, '..', 'public', 'qustion-bank.html');
-        console.log(userData)    
-        res.sendFile(topicPath);
+        const topicPath = path.join(__dirname, '..', 'public', 'qustion.html');
+        const qsname = await Questionbank.find({
+            MasterName: userData.name
+        });
+        sockets.Qsname(qsname)
+        //console.log('userData', userData)
+        //console.log('qsname', qsname)
+        return res.sendFile(topicPath);
     } catch (error) {
         console.log(error.message);
         return res.redirect(`/home`);
     }
 }
 
+const QuestionBankName = async (req, res) => {
+    try {
+        const UserRole = req.session.user.role;
+        if (UserRole === 'teacher') {
+            const Questionname = req.body.QuestionBank;
+            const qsname = await Questionbank.findOne({
+                Itemname: Questionname
+            });
+            if (!qsname) {
+                const Question = new Questionbank({
+                    MasterName: req.session.user.name,
+                    role: UserRole,
+                    Itemname: Questionname,
+                });
+                await Question.save();
+            }
+            return res.redirect(`/home/rooms/topic`);
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.redirect(`/home/rooms/topic`);
+    }
+}
+
+const Questiontopic = async (req, res) => {
+    try {
+        const item = req.body.Itemname;
+        const Itemname = await Questionbank.findOne({
+            Itemname: item
+        });
+
+        const topicview = await topicans.find({
+            topic: Itemname.topic
+        });
+
+        if (topicview) {
+            console.log("Itemname0:topic", Itemname.topic)
+            console.log("topicview", topicview)
+            res.json({
+                topicview
+            });
+        }
+        //return res.redirect(`/home/rooms/topic`);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            error: 'Internal Server Error'
+        });
+    }
+}
+
+const QuestionBanktopic = async (req, res) => {
+    try {
+        //const item = req.body;
+        console.log(req.body.extradata)
+        console.log(req.session.user.name)
+        const Itemname = await Questionbank.findOne({
+            $and: [{
+                Itemname: req.body.extradata
+            }, {
+                MasterName: req.session.user.name
+            }]
+        });
+        if (Itemname) {
+            Itemname.topic.push(req.body.questiontextarea)
+            await Itemname.save();
+
+            console.log(req.body)
+
+            const TopicC = new topicans({
+                MasterName: req.session.user.name,
+                role: req.session.user.role,
+                Itemname: req.body.extradata,
+                topic: req.body.questiontextarea,
+                ans: [req.body.opationname1, req.body.opationname2, req.body.opationname3, req.body.opationname4],
+                correctOption: req.body.qusopation
+            });
+
+            await TopicC.save();
+            return res.redirect(`/home/rooms/topic`);
+
+        }
+        console.log(Itemname)
+        //return res.redirect(`/home/rooms/topic`);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
 module.exports = {
     create,
     classroom,
     joinClassroom,
     GoChat,
-    topic
+    topic,
+    QuestionBankName,
+    Questiontopic,
+    QuestionBanktopic
 };

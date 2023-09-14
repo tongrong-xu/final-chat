@@ -79,10 +79,10 @@
                             aria-labelledby="sign-up-profile-tab">
                             <form action="/registerstudent" method="post" class="theForm"
                                 style="background-color: #FFF0C8;">
-                                <input type="text" name="email" id="" placeholder="請輸入電子郵件">
+                                <input type="text" name="username" id="" placeholder="請輸入姓名">
                                 <input type="email" name="email" id="" placeholder="請輸入電子郵件">
                                 <input type="password" name="password" id="" placeholder="輸入密碼">
-                                <input type="password" name="re-password" id="" placeholder="確認密碼">
+                                <input type="password" name="repassword" id="" placeholder="確認密碼">
                                 <button type="submit" class="index-btn"
                                     style="background-color: rgb(106, 66, 29 );">送出</button>
                             </form>
@@ -130,7 +130,7 @@
                                 <input type="text" name="username" id="" placeholder="請輸入使用者名稱">
                                 <input type="email" name="email" id="" placeholder="請輸入電子郵件">
                                 <input type="password" name="password" id="" placeholder="輸入密碼">
-                                <input type="password" name="re-password" id="" placeholder="確認密碼">
+                                <input type="password" name="repassword" id="" placeholder="確認密碼">
                                 <button type="submit" class="index-btn"
                                     style="background-color: rgb(19, 78, 111);">送出</button>
                             </form>
@@ -175,6 +175,9 @@
         window.location.href = "/";
     } else if (message === 'Email NG') {
         window.alert("登入錯誤");
+        window.location.href = "/";
+    } else if (message === 'password error') {
+        window.alert("密碼不符");
         window.location.href = "/";
     } 
 </script>

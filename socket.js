@@ -14,6 +14,12 @@ let RoomViewCode;
 let homename;
 let homerole;
 let homeLv;
+let qsname;
+let TopicView;
+
+function QSTopicView(View) {
+    TopicView = View;
+}
 
 function HomeName(name) {
     homename = name;
@@ -50,6 +56,11 @@ function SetRoomCode(code) {
 function ViewRoomCode(viewcode) {
     RoomViewCode = viewcode;
 }
+
+function Qsname(qsb) {
+    qsname = qsb;
+}
+
 
 // 主要的 socket 事件處理函式
 const Online = []
@@ -91,6 +102,8 @@ const socketOn = function (io) {
         socket.emit('role', userrole);
         socket.emit('RoomCode', roomCode);
         socket.emit('viewcode', RoomViewCode);
+        socket.emit('qsname', qsname);
+        socket.emit('TopicView', TopicView);
         socket.on('entercode', async function (roomdata) {
             console.log(userId)
             socket.emit('myname', userName)
@@ -288,7 +301,7 @@ const socketOn = function (io) {
                             // 更新離線列表
                             Offline[roomdata].push(removedUser);
                             io.to(roomdata).emit('RoomMemberOffline', Offline[roomdata]);
-                            
+
                         }
 
                         socket.leave(roomdata);
@@ -323,5 +336,7 @@ module.exports = {
     ViewRoomCode,
     HomeName,
     Homerole,
-    HomeLv
+    HomeLv,
+    Qsname,
+    QSTopicView
 };

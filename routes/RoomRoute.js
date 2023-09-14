@@ -14,7 +14,13 @@ Room.post('/joinClassroom', auth.requireLogin, RoomController.joinClassroom);
 
 Room.post('/GoChat', auth.requireLogin, RoomController.GoChat);
 
-Room.post('/topic', auth.requireLogin, RoomController.topic);
+Room.get('/topic', auth.requireLogin, auth.isteacher, RoomController.topic);
+
+Room.post('/topic/QuestionBankName', auth.requireLogin, auth.isteacher, RoomController.QuestionBankName);
+
+Room.post('/topic/Questiontopic', auth.requireLogin, auth.isteacher, RoomController.Questiontopic);
+
+Room.post('/topic/QuestionBanktopic', auth.requireLogin, auth.isteacher, RoomController.QuestionBanktopic);
 
 Room.use(express.static('public'));
 

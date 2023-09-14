@@ -50,21 +50,24 @@ const registerstudent = async (req, res) => {
             console.log("重複註冊");
             return res.redirect('/?message=Email%20already');
         } else {
-            const passwordHash = await bcrypt.hash(req.body.password, 10);
+            if (req.body.password == req.body.repassword) {
+                const passwordHash = await bcrypt.hash(req.body.password, 10);
+                const user = new student({
+                    name: req.body.username,
+                    email: email,
+                    passwordHash: passwordHash,
+                    password: req.body.password,
+                    role: role
+                });
 
-            const user = new student({
-                name: req.body.username,
-                email: email,
-                passwordHash: passwordHash,
-                password: req.body.password,
-                role: role
-            });
+                await user.save();
 
-            await user.save();
+                res.redirect('/?message=Email%20pass');
 
-            res.redirect('/?message=Email%20pass');
-
-            console.log(user, "學生通過註冊");
+                console.log(user, "學生通過註冊");
+            } else {
+                res.redirect('/?message=password%20error');
+            }
         }
     } catch (error) {
         console.log(error.message);
@@ -115,21 +118,24 @@ const registerteacher = async (req, res) => {
             console.log("重複註冊");
             return res.redirect('/?message=Email%20already');
         } else {
-            const passwordHash = await bcrypt.hash(req.body.password, 10);
+            if (req.body.password == req.body.repassword) {
+                const passwordHash = await bcrypt.hash(req.body.password, 10);
+                const user = new teacher({
+                    name: req.body.username,
+                    email: email,
+                    passwordHash: passwordHash,
+                    password: req.body.password,
+                    role: role
+                });
 
-            const user = new teacher({
-                name: req.body.username,
-                email: email,
-                passwordHash: passwordHash,
-                password: req.body.password,
-                role: role
-            });
+                await user.save();
 
-            await user.save();
+                res.redirect('/?message=Email%20pass');
 
-            res.redirect('/?message=Email%20pass');
-
-            console.log(user, "教師通過註冊");
+                console.log(user, "教師通過註冊");
+            } else {
+                res.redirect('/?message=password%20error');
+            }
         }
     } catch (error) {
         console.log(error.message);

@@ -9,30 +9,18 @@ const topicSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    Itemname: {
+        type: String,
+        required: true
+    },
     topic: {
         type: String,
         required: true
     },
-    ansone: {
-        type: String,
-        required: true
-    },
-    anstwo: {
-        type: String,
-        required: true
-    },
-    ansthr: {
-        type: String,
-        required: true
-    },
-    ansfou: {
-        type: String,
-        required: true
-    },
-    ans: {
-        type: String,
-        required: true
-    }
+    ans: [
+        String
+    ],
+    correctOption: Number
 }, {
     timestamps: true // 自動添加 createdAt 和 updatedAt 欄位
 });
