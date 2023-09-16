@@ -142,7 +142,13 @@ $(document).ready(function () {
         return qusBankDom;
     }
 
-
+    document.getElementById('item').addEventListener('submit', function (event) {
+        const inputElement = document.getElementById('question-textarea');
+        const userInput = inputElement.value;
+        if (userInput.trim() === '' || userInput === '\n' || userInput === '\r\n') {
+            console.log(userInput)
+        }
+    });
     //控制選項
     const editQusBtn = $(".edit-qus");
     const createQusBtn = $(".create-qus");
@@ -178,6 +184,7 @@ $(document).ready(function () {
 
     const makeQusCon = $("#topic");
     makeQusCon.hide();
+    const makeQusBackv = $("#make-qus-backv");
     const makeQusBack = $("#make-qus-back");
     const makeQusBg = $("#make-qus-bg");
     makeQusBg.hide()
@@ -190,20 +197,31 @@ $(document).ready(function () {
         itemCon.show();
         makeQusBg.show();
     });
-    makeQusBack.click(function () {
+    makeQusBackv.click(function () {
         itemCon.hide();
         makeQusBg.hide();
     });
 
     function formatDate(isoDateString) {
         const date = new Date(isoDateString);
-      
+
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-      
+
         return `${year}-${month}-${day}`;
-      }
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        return text.replace(/[&<>"']/g, (match) => map[match]);
+    }
     // 引入Socket.io庫
     const socket = io();
     const qustionbank = document.getElementById('SQB');
@@ -216,12 +234,12 @@ $(document).ready(function () {
             qsname.forEach((qsn, index, name) => {
                 // 創建新的<div>元素
                 const newDiv = document.createElement('div');
-                newDiv.className = 'col row align-items-center qus-bank qusbank-choose';
+                newDiv.className = 'col row align-items-center qus-bank';
                 // 設置自訂屬性以供後續使用
                 newDiv.setAttribute('qusbank-id', index + 1);
                 // 創建內部HTML內容
                 newDiv.innerHTML = `
-                  <div class="col-9 line-clamp-1 qustionbank-text">${qsn.Itemname}</div>
+                  <div class="col-9 line-clamp-1 qustionbank-text">${escapeHtml(qsn.Itemname)}</div>
                   <div class="col-3 rank">編輯</div>
                   <hr style="margin: 0;">
                 `;
@@ -229,6 +247,11 @@ $(document).ready(function () {
                 qustionbank.appendChild(newDiv);
                 newDiv.addEventListener('click', async () => {
                     try {
+                        const qusBankElements = document.querySelectorAll('.qus-bank');
+                        qusBankElements.forEach((element) => {
+                            element.classList.remove('qusbank-choose');
+                        });
+                        newDiv.classList.add("qusbank-choose")
                         QSBname.textContent = qsn.Itemname;
                         accordionExample.innerHTML = ''
                         const item = qsn.Itemname
@@ -236,6 +259,7 @@ $(document).ready(function () {
                         const requestData = {
                             Itemname: item
                         };
+
                         createQusBtn.click(function () {
                             makeQusCon.show();
                             makeQusBg.show();
@@ -272,7 +296,7 @@ $(document).ready(function () {
                                             ${formattedDate}
                                             </div>
                                             <div class="qus-name">
-                                                ${question.topic}
+                                                ${escapeHtml(question.topic)}
                                             </div>
                                         </button>
                                     </h2>
@@ -281,7 +305,7 @@ $(document).ready(function () {
                                             <div class="row">
                                                 ${question.ans.map((option, optionIndex) => `
                                                     <div class="qus-btn col ${optionIndex + 1 === question.correctOption ? 'qus-btn-correct' : ''}">
-                                                        ${option}
+                                                    ${escapeHtml(option)}
                                                     </div>
                                                 `).join('')}
                                             </div>
