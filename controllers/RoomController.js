@@ -144,8 +144,6 @@ const topic = async (req, res) => {
             MasterName: userData.name
         });
         sockets.Qsname(qsname)
-        //console.log('userData', userData)
-        //console.log('qsname', qsname)
         return res.sendFile(topicPath);
     } catch (error) {
         console.log(error.message);
@@ -159,7 +157,11 @@ const QuestionBankName = async (req, res) => {
         if (UserRole === 'teacher') {
             const Questionname = req.body.QuestionBank;
             const qsname = await Questionbank.findOne({
-                Itemname: Questionname
+                $and: [{
+                    Itemname: Questionname
+                }, {
+                    MasterName: req.session.user.name
+                }]
             });
             if (!qsname) {
                 const Question = new Questionbank({
@@ -185,17 +187,19 @@ const Questiontopic = async (req, res) => {
         });
 
         const topicview = await topicans.find({
-            topic: Itemname.topic
+            $and: [{
+                topic: Itemname.topic
+            }, {
+                MasterName: req.session.user.name
+            }]
         });
 
         if (topicview) {
-            console.log("Itemname0:topic", Itemname.topic)
             console.log("topicview", topicview)
             res.json({
                 topicview
             });
         }
-        //return res.redirect(`/home/rooms/topic`);
     } catch (error) {
         console.log(error.message);
         res.status(500).json({
@@ -204,11 +208,9 @@ const Questiontopic = async (req, res) => {
     }
 }
 
+
 const QuestionBanktopic = async (req, res) => {
     try {
-        //const item = req.body;
-        console.log(req.body.extradata)
-        console.log(req.session.user.name)
         const Itemname = await Questionbank.findOne({
             $and: [{
                 Itemname: req.body.extradata
@@ -220,8 +222,6 @@ const QuestionBanktopic = async (req, res) => {
             Itemname.topic.push(req.body.questiontextarea)
             await Itemname.save();
 
-            console.log(req.body)
-
             const TopicC = new topicans({
                 MasterName: req.session.user.name,
                 role: req.session.user.role,
@@ -232,13 +232,30 @@ const QuestionBanktopic = async (req, res) => {
             });
 
             await TopicC.save();
-            return res.redirect(`/home/rooms/topic`);
+            if (TopicC) {
+                console.log('req.body.extradata', req.body.extradata)
+                const Itemname = await Questionbank.findOne({
+                    Itemname: req.body.extradata
+                });
 
+                const topicview = await topicans.find({
+                    topic: Itemname.topic
+                });
+
+                if (topicview) {
+                    console.log("Itemname0:topic", Itemname.topic)
+                    console.log("topicview", topicview)
+                    res.json({
+                        topicview
+                    });
+                }
+            }
         }
-        console.log(Itemname)
-        //return res.redirect(`/home/rooms/topic`);
     } catch (error) {
         console.log(error.message);
+        res.status(500).json({
+            error: 'Internal Server Error'
+        });
     }
 }
 

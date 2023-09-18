@@ -10,8 +10,12 @@ $(document).ready(function () {
 
     var nowQusBankId = 0; //目前選擇的題庫id
 
+    function removeWhiteSpaceAndNewline(input) {
+        input.value = input.value.replace(/\s+/g, ''); // 移除所有空格和回車
+    }
+
     //選擇題庫
-    qusBank.click(function () {
+    /*qusBank.click(function () {
         qusBank.each(function () {
             qusBank.removeClass("qusbank-choose");
         });
@@ -25,7 +29,7 @@ $(document).ready(function () {
         qusIndex = 0;
     });
 
-
+*/
 
     //------------------以下自動創建---------------
 
@@ -92,7 +96,7 @@ $(document).ready(function () {
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading${qusContent["qusIndex"]}">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${qusContent["qusIndex"]}" aria-expanded="true" aria-controls="collapse${qusContent["qusIndex"]}">
-                ${qusContent["qustion"]}${qusContent["qusIndex"]+1}
+                ${qusContent["qustion"]}${qusContent["qusIndex"] + 1}
             </button>
             </h2>
             <div id="collapse${qusContent["qusIndex"]}" class="accordion-collapse collapse" aria-labelledby="heading${qusContent["qusIndex"]}" data-bs-parent="#accordionExample">
@@ -142,13 +146,6 @@ $(document).ready(function () {
         return qusBankDom;
     }
 
-    document.getElementById('item').addEventListener('submit', function (event) {
-        const inputElement = document.getElementById('question-textarea');
-        const userInput = inputElement.value;
-        if (userInput.trim() === '' || userInput === '\n' || userInput === '\r\n') {
-            console.log(userInput)
-        }
-    });
     //控制選項
     const editQusBtn = $(".edit-qus");
     const createQusBtn = $(".create-qus");
@@ -228,6 +225,112 @@ $(document).ready(function () {
     const QSBname = document.getElementById('QSBname');
     const QSBnum = document.getElementById('QSBnum');
     const accordionExample = document.getElementById('accordionExample');
+
+    document.getElementById('item').addEventListener('submit', function (event) {
+        var inputs = document.querySelectorAll('input[type="text"], textarea');
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].value.includes(' ') || inputs[i].value.includes('\n')) {
+                alert('輸入中包含空格或回車，請重新輸入。');
+                event.preventDefault();
+                break;
+            }
+        }
+
+    });
+
+    document.getElementById('topicform').addEventListener('submit', async function (event) {
+        var inputs = document.querySelectorAll('input[type="text"], textarea');
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].value.includes(' ') || inputs[i].value.includes('\n')) {
+                alert('輸入中包含空格或回車，請重新輸入。');
+                event.preventDefault();
+                break;
+            }
+        }
+        try {
+            // 獲取表單中的數據
+            const questiontextarea = document.getElementById('question-textarea').value;
+            const extradata = document.getElementById('extradata').value;
+            const qusopation = document.querySelector('input[name="qusopation"]:checked').value;
+            const opationname1 = document.getElementById('opation-name-1').value;
+            const opationname2 = document.getElementById('opation-name-2').value;
+            const opationname3 = document.getElementById('opation-name-3').value;
+            const opationname4 = document.getElementById('opation-name-4').value;
+
+            const bodyuse = JSON.stringify({
+                questiontextarea,
+                extradata,
+                qusopation,
+                opationname1: opationname1,
+                opationname2: opationname2,
+                opationname3: opationname3,
+                opationname4: opationname4
+            })
+            // 發送數據到服務器
+            const response = await fetch('/home/rooms/topic/QuestionBanktopic', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: bodyuse
+            });
+
+            if (!response.ok) {
+                throw new Error('網絡響應失敗');
+            }
+
+            // 清空表單字段
+            makeQusCon.hide();
+            document.getElementById('question-textarea').value = '';
+            document.getElementById('opation-name-1').value = '';
+            document.getElementById('opation-name-2').value = '';
+            document.getElementById('opation-name-3').value = '';
+            document.getElementById('opation-name-4').value = '';
+
+
+            // 可以根據服務器響應決定如何處理成功的情況
+            const responseData = await response.json();
+            console.log('服務器響應：', responseData);
+            if (responseData) {
+                QSBnum.textContent = ''
+                const view = responseData.topicview
+                QSBnum.textContent = '題目數量：' + view.length
+                view.forEach((question, index) => {
+                    const formattedDate = formatDate(question.createdAt);
+                    const questionDom = `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading${index + 1}">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="true" aria-controls="collapse${index}">
+                                <div class="create-date">
+                                ${formattedDate} 第${index + 1}題
+                                </div>
+                                <div class="qus-name">
+                                    ${escapeHtml(question.topic)}
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse${index + 1}" class="accordion-collapse collapse show" aria-labelledby="heading${index}" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    ${question.ans.map((option, optionIndex) => `
+                                        <div class="qus-btn col ${optionIndex + 1 === question.correctOption ? 'qus-btn-correct' : ''}">
+                                        ${escapeHtml(option)}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                    accordionExample.innerHTML += questionDom;
+                });
+            }
+        } catch (error) {
+            console.error('Fetch error:', error.message);
+        }
+    });
+
     socket.on('connect', function () {
         socket.on('qsname', (qsname) => {
             console.log('qsname', qsname)
@@ -255,7 +358,6 @@ $(document).ready(function () {
                         QSBname.textContent = qsn.Itemname;
                         accordionExample.innerHTML = ''
                         const item = qsn.Itemname
-                        QSBnum.textContent = '題目數量：' + qsn.topic.length
                         const requestData = {
                             Itemname: item
                         };
@@ -286,21 +388,22 @@ $(document).ready(function () {
                         const data = await response.json(); // Parse the JSON response
                         console.log('data:', data.topicview)
                         const view = data.topicview
+                        QSBnum.textContent = '題目數量：' + view.length
                         view.forEach((question, index) => {
                             const formattedDate = formatDate(question.createdAt);
                             const questionDom = `
                                 <div class="accordion-item">
-                                    <h2 class="accordion-header" id="heading${index+1}">
+                                    <h2 class="accordion-header" id="heading${index + 1}">
                                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="true" aria-controls="collapse${index}">
                                             <div class="create-date">
-                                            ${formattedDate}
+                                            ${formattedDate} 第${index + 1}題
                                             </div>
                                             <div class="qus-name">
                                                 ${escapeHtml(question.topic)}
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapse${index+1}" class="accordion-collapse collapse show" aria-labelledby="heading${index}" data-bs-parent="#accordionExample">
+                                    <div id="collapse${index + 1}" class="accordion-collapse collapse show" aria-labelledby="heading${index}" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
                                             <div class="row">
                                                 ${question.ans.map((option, optionIndex) => `
@@ -318,7 +421,7 @@ $(document).ready(function () {
                         });
                         // Handle the 'data' as needed
                     } catch (error) {
-                        console.error('Fetch error:', error.message);
+                        console.error('Fetch error in input topic:', error.message);
                     }
                 })
             });

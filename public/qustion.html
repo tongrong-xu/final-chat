@@ -149,12 +149,12 @@
 
   <!-- --------------------出題視窗--------------------- -->
   <!-- <div id="make-qus-bg">測試內容</div> -->
-  <form action="/home/rooms/topic/QuestionBanktopic" method="post">
+  <form action="" method="post" id="topicform">
     <div class="make-quetion-con" id="topic">
       <div class="make-quetion container-fluid">
         <div class="row w-100">
           <textarea name="questiontextarea" id="question-textarea" cols="10" rows="4" placeholder="請輸入題目並選擇正解"
-            required></textarea>
+            required oninput="removeWhiteSpace(this)" maxlength="60"></textarea>
         </div>
 
         <input type="hidden" name="extradata" id="extradata" value="">
@@ -163,22 +163,22 @@
           <div class="col-6" style="margin-bottom: 10px;">
             <input type="radio" class="qus-opation" name="qusopation" id="qus-opation-1" value="1" required>
             <input type="text" class="qus-opation-name" name="opationname1" id="opation-name-1" placeholder="請輸入選項"
-              required>
+              required oninput="removeWhiteSpace(this)" maxlength="30">
           </div>
           <div class="col-6" style="margin-bottom: 10px;">
             <input type="radio" class="qus-opation" name="qusopation" id="qus-opation-2" value="2" required>
             <input type="text" class="qus-opation-name" name="opationname2" id="opation-name-2" placeholder="請輸入選項"
-              required>
+              required oninput="removeWhiteSpace(this)" maxlength="30">
           </div>
           <div class="col-6">
             <input type="radio" class="qus-opation" name="qusopation" id="qus-opation-3" value="3" required>
             <input type="text" class="qus-opation-name" name="opationname3" id="opation-name-3" placeholder="請輸入選項"
-              required>
+              required oninput="removeWhiteSpace(this)" maxlength="30">
           </div>
           <div class="col-6">
             <input type="radio" class="qus-opation" name="qusopation" id="qus-opation-4" value="4" required>
             <input type="text" class="qus-opation-name" name="opationname4" id="opation-name-4" placeholder="請輸入選項"
-              required>
+              required oninput="removeWhiteSpace(this)" maxlength="30">
           </div>
         </div>
         <div class="row w-100" style="justify-content: center;align-items: center;">
@@ -196,7 +196,7 @@
       <div class="make-quetion container-fluid">
         <div class="row w-100">
           <textarea name="QuestionBank" id="question-textarea" cols="10" rows="4" placeholder="請輸入題庫名稱"
-            required></textarea>
+            required oninput="removeWhiteSpace(this)" maxlength="30"></textarea>
         </div>
         <div class="row w-100" style="justify-content: center;align-items: center;">
           <input type="submit" value="題庫名稱" id="make-qus-btn" class="create-qus-btn w-25">
