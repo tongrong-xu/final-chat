@@ -107,4 +107,50 @@ $(document).ready(function(){
         logInHomeTab2.attr("id","log-in-home-tab2-active");
         signUpProfileTab2.attr("id","sign-up-profile-tab2-non");
     });
+
+
+
+
+    //註冊頁面預覽頭貼
+    const fileInputStu = $("#inputFile-student");
+    const thumbnailStu = $("#thumbnail-student");
+    const fileInputTeacher = $("#inputFile-teacher");
+    const thumbnailTeacher = $("#thumbnail-teacher");
+
+    //判斷input是否有選擇檔案
+    fileInputStu.change(function(event) {
+        const file = event.target.files[0];
+
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                thumbnailStu.attr("src", event.target.result);
+                thumbnailStu.css("visibility", "visible");
+            };
+            reader.readAsDataURL(file);
+        }else{
+            alert("請選擇圖片文件");
+            fileInputStu.val(""); 
+            thumbnailStu.attr("src", "");
+        }
+    });
+    //判斷input是否有選擇檔案
+    fileInputTeacher.change(function(event) {
+        const file = event.target.files[0];
+
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                thumbnailTeacher.attr("src", event.target.result);
+                thumbnailTeacher.css("visibility", "visible");
+            };
+            reader.readAsDataURL(file);
+        }else{
+            alert("請選擇圖片文件");
+            fileInputTeacher.val(""); 
+            thumbnailTeacher.attr("src", "");
+        }
+    });
+
+    
 });

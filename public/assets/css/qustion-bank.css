@@ -1,16 +1,22 @@
-#bg{
+body {
+    display: flex;
+    justify-content: center;
+}
+
+#bg {
     background-color: antiquewhite;
     padding: 5vh 7vw;
     height: 100vh;
     display: flex;
     /* flex-wrap: nowrap; */
-    margin: 0;
 }
-a{
+
+a {
     text-decoration: none;
     color: black;
 }
-.back{
+
+.back {
     flex-grow: 0;
     /* width: calc(100vw - 14vw); */
     font-size: 28px;
@@ -19,7 +25,8 @@ a{
     height: 5vh;
     margin-bottom: 10px;
 }
-.qustionbank-con{
+
+.qustionbank-con {
     width: calc(100% - 5vw);
     height: calc(95vh - 10vh - 10px);
     margin-right: 5vw;
@@ -27,18 +34,20 @@ a{
     border-radius: 25px;
     background-color: white;
     overflow: hidden;
-    
+
 }
-.qustion-con{
+
+.qustion-con {
     width: calc(100%);
     height: calc(95vh - 10vh - 10px);
     border: 1px solid;
     border-radius: 25px;
     background-color: white;
     overflow: hidden;
-    
+
 }
-.board-con-2{
+
+.board-con-2 {
     width: 100%;
     height: 100%;
     background-color: white;
@@ -47,23 +56,32 @@ a{
     overflow-y: auto;
     padding: 0;
 }
-.qustionbank-text{
+
+.qustionbank-text {
     padding-left: 30px;
     padding-top: 3px;
     padding-bottom: 2px;
 }
-.qus-bank{
+
+.qus-bank {
     background-color: white;
+    font-size: 22px;
+    padding: 5px;
+    padding-bottom: 5px;
 }
-.qus-bank:hover{
+
+.qus-bank:hover {
     filter: brightness(0.9);
     cursor: pointer;
-    
+
 }
-.qusbank-choose{
-    background-color: rgb(217, 227, 241);
+
+.qusbank-choose {
+    background-color: #e7f1ff;
+    color: #0c63e4;
 }
-.qus-btn{
+
+.qus-btn {
     background-color: bisque;
     border: 1px solid;
     border-radius: 50px;
@@ -73,93 +91,145 @@ a{
     padding: 5px 0px;
     font-weight: 600;
 }
-.qus-btn:hover{
+
+.qus-btn:hover {
     filter: brightness(0.9);
 }
+
 /* 選項正解套上這個class */
-.qus-btn-correct{
-    background-color: brown !important; 
+.qus-btn-correct {
+    background-color: brown !important;
     color: white !important;
 }
-.line-clamp-1{
+
+.line-clamp-1 {
     display: -webkit-box;
-    -webkit-box-orient: vertical; 
-    text-overflow:hidden;
-    overflow:hidden;
+    -webkit-box-orient: vertical;
+    text-overflow: hidden;
+    overflow: hidden;
     -webkit-line-clamp: 1;
 }
-.line-clamp-2{
+
+.line-clamp-2 {
     display: -webkit-box;
-    -webkit-box-orient: vertical; 
-    text-overflow:hidden;
-    overflow:hidden;
+    -webkit-box-orient: vertical;
+    text-overflow: hidden;
+    overflow: hidden;
     -webkit-line-clamp: 2;
 }
-.line-clamp-3{
+
+.line-clamp-3 {
     display: -webkit-box;
-    -webkit-box-orient: vertical; 
-    text-overflow:hidden;
-    overflow:hidden;
+    -webkit-box-orient: vertical;
+    text-overflow: hidden;
+    overflow: hidden;
     -webkit-line-clamp: 3;
 }
-.qustion-in-bank{
+
+.qustion-in-bank {
     overflow-y: auto;
     height: 90%;
 }
-.qus-manager{
+
+.qus-manager {
     width: 100%;
     height: 10%;
     background-color: whitesmoke;
     border-bottom: 1px solid;
     padding: 10px;
-    box-shadow: 0px 1px 5px rgb(0, 0, 0,0.3);
+    box-shadow: 0px 1px 5px rgb(0, 0, 0, 0.3);
     margin-right: 0 !important;
     margin-left: 0 !important;
     align-items: center;
 }
-.edit-qus:hover{
+
+.qusbank-manager {
+    width: 100%;
+    height: 10%;
+    background-color: whitesmoke;
+    border-bottom: 1px solid;
+    padding: 10px;
+    box-shadow: 0px 1px 5px rgb(0, 0, 0, 0.3);
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    align-items: center;
+}
+
+.edit-qus:hover {
     cursor: pointer;
-    background-color: rgb(0, 0, 0,0.07);
+    background-color: rgb(0, 0, 0, 0.07);
     border-radius: 10px;
 }
-.create-qus:hover{
+
+.edit-qusbank:hover {
     cursor: pointer;
-    background-color: rgb(0, 0, 0,0.07);
+    background-color: rgb(0, 0, 0, 0.1);
     border-radius: 10px;
 }
-.qusion-number{
+
+.create-qus:hover {
+    cursor: pointer;
+    background-color: rgb(0, 0, 0, 0.07);
+    border-radius: 10px;
+}
+
+.create-qusbank:hover {
+    cursor: pointer;
+    background-color: rgb(0, 0, 0, 0.07);
+    border-radius: 10px;
+}
+
+.qustion-number {
     text-align: end;
     font-size: 24px;
     padding-left: 0px;
     padding-right: 30px;
 }
-.qusion-name{
+
+.qustion-name {
     font-size: 24px;
     padding-left: 20px;
 }
-.create-date{
+
+.qusbank-number {
+    text-align: end;
+    font-size: 20px;
+    padding-left: 0px;
+    padding-right: 30px;
+}
+
+.qusbank-name {
+    font-size: 24px;
+    padding-left: 15px;
+}
+
+.create-date {
     font-size: 16px;
     margin-right: 20px;
     /* color: gray; */
     opacity: 0.8;
 }
-.qus-name{
+
+.qus-name {
     font-size: 22px;
 }
-.edit-qus-name-input{
+
+.edit-qus-name-input {
     height: 30px;
     border-radius: 10px;
     border: 1px solid;
     margin-left: 20px;
     padding-left: 10px;
 }
-.edit-qus-name-submit{
+
+.edit-qus-name-submit {
     margin-left: 10px;
 }
 
 
+
 /* 出題視窗 */
-.make-quetion-con{
+.make-quetion-con {
     position: fixed;
     width: 40vw;
     height: 50vh;
@@ -172,9 +242,10 @@ a{
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0px 2px 5px rgb(0, 0, 0 , 0.4);
+    box-shadow: 0px 2px 5px rgb(0, 0, 0, 0.4);
 }
-.make-quetion{
+
+.make-quetion {
     width: 100%;
     height: 100%;
     background-color: #9E785D;
@@ -184,11 +255,12 @@ a{
     border-radius: 20px;
     padding: 25px 15px;
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: center;
     flex-direction: column;
 }
-#question-textarea{
+
+#question-textarea {
     font-size: 24px;
     padding: 10px;
     border-radius: 20px;
@@ -196,13 +268,15 @@ a{
     background-color: blanchedalmond;
     width: calc(100% - 40px);
 }
-.qus-opation{
+
+.qus-opation {
     scale: 3;
-    transform: translate(5px,0);
+    transform: translate(5px, 0);
     margin-right: 30px;
     background-color: blanchedalmond;
 }
-.qus-opation-name{
+
+.qus-opation-name {
     width: calc(100% - 50px);
     border-radius: 20px;
     border-style: solid;
@@ -212,7 +286,8 @@ a{
     font-size: 24px;
     padding: 0px 20px;
 }
-#make-qus-btn{
+
+#make-qus-btn {
     /* margin: 0px;
     margin-bottom: 0;
     width: calc(40% - 40px);
@@ -220,7 +295,8 @@ a{
     /* font-weight: 600;
     font-size: 28px; */
 }
-.create-qus-btn{
+
+.create-qus-btn {
     margin: 0px;
     margin-top: 10px;
     margin-bottom: 0;
@@ -239,11 +315,97 @@ a{
     align-items: center;
     justify-content: center;
 }
-#make-qus-bg{
+
+#make-qus-bg {
     width: 100vw;
     height: 100vh;
     position: fixed;
     /* display: flex; */
-    background-color: rgb(0, 0, 0,0.25);
+    background-color: rgb(0, 0, 0, 0.25);
     z-index: 18;
+}
+
+.edit-qus {
+    right: 0;
+}
+
+.qustionbank-number {
+    font-size: 20px;
+    text-align: end;
+}
+
+/* 創建題庫視窗 */
+.make-quetionbank-con {
+    position: fixed;
+    width: 40vw;
+    height: 30vh;
+    right: calc((100vw - 40vw) / 2);
+    top: calc((100vh - 50vh) / 2 - 5vh);
+    background-color: #FFD25D;
+    border: 10px solid #FFD25D;
+    border-radius: 25px;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 2px 5px rgb(0, 0, 0, 0.4);
+}
+
+.make-qusbank {
+    width: 100%;
+    height: 100%;
+    background-color: #9E785D;
+    z-index: 30;
+    box-sizing: border-box;
+    border: 10px solid #6e4b32;
+    border-radius: 20px;
+    padding: 25px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#quesbank-input {
+    font-size: 24px;
+    padding: 10px;
+    border-radius: 20px;
+    margin: 0px 20px;
+    background-color: blanchedalmond;
+    width: calc(100% - 40px);
+    margin-bottom: 15px;
+}
+
+.qus-opation {
+    scale: 3;
+    transform: translate(5px, 0);
+    margin-right: 30px;
+    background-color: blanchedalmond;
+}
+
+.qus-opation-name {
+    width: calc(100% - 50px);
+    border-radius: 20px;
+    border-style: solid;
+    background-color: blanchedalmond;
+    font-size: 24px;
+    padding: 0px 20px;
+}
+
+.create-qusbank-btn {
+    margin: 0px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    width: calc(50% - 40px);
+    height: 90%;
+    background-color: #30705D;
+    border: 10px solid yellow;
+    border-radius: 50px;
+    margin-right: 20px;
+    font-weight: 600;
+    font-size: 28px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

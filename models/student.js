@@ -11,6 +11,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    image: {
+        type: String,
+        required: true
+    },
     passwordHash: {
         type: String,
         required: true
@@ -34,11 +38,7 @@ const UserSchema = new mongoose.Schema({
     coin: {
         type: Number,
         default: 0
-    },
-    online: {
-        type: Boolean,
-        default: false
-    },
+    }
 }, {
     timestamps: true
 });

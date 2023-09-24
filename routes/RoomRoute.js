@@ -10,19 +10,23 @@ Room.post('/', auth.requireLogin, RoomController.create);
 
 Room.get('/Room_:roomCode', auth.requireLogin, RoomController.classroom);
 
+Room.get('/classroomData', auth.requireLogin, RoomController.classroomData);
+
 Room.post('/joinClassroom', auth.requireLogin, RoomController.joinClassroom);
 
 Room.post('/GoChat', auth.requireLogin, RoomController.GoChat);
 
 Room.get('/topic', auth.requireLogin, auth.isteacher, RoomController.topic);
 
-Room.post('/topic', auth.requireLogin, auth.isteacher, RoomController.topic);
+Room.get('/QSbankData', auth.requireLogin, auth.isteacher, RoomController.QSbankData);
 
-Room.post('/topic/QuestionBankName', auth.requireLogin, auth.isteacher, RoomController.QuestionBankName);
+Room.post('/QuestionBankName', auth.requireLogin, auth.isteacher, RoomController.QuestionBankName);
 
-Room.post('/topic/Questiontopic', auth.requireLogin, auth.isteacher, RoomController.Questiontopic);
+Room.post('/BankNameUpdata', auth.requireLogin, auth.isteacher, RoomController.BankNameUpdata);
 
-Room.post('/topic/QuestionBanktopic', auth.requireLogin, RoomController.QuestionBanktopic);
+Room.post('/Questiontopic', auth.requireLogin, auth.isteacher, RoomController.Questiontopic);
+
+Room.post('/QuestionBanktopic', auth.requireLogin, RoomController.QuestionBanktopic);
 
 Room.use(express.static('public'));
 

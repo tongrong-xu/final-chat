@@ -157,7 +157,6 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-
     const usernameElement = document.getElementById('username');
     const userLvElement = document.getElementById('userLv');
     const userroleElement = document.getElementById('userrole');
@@ -174,40 +173,27 @@
         return `${month}-${day}`;
     }
 
-    // Socket.IO 連接
-    const socket = io();
-    let socketname
-    let socketLv
-    let socketrole
-
-    // 連接狀態處理
-    socket.on('connect', function () {
-        console.log('Connected');
-        roomInfoElement.innerHTML = '';
-    });
-
-    // 更新用戶名稱
-    socket.on('homename', (name) => {
-        socketname = name
-        socket.emit('login', name)
-        usernameElement.textContent = name ? name : 'name is unknown';
-    });
-
-    // 更新用戶等級
-    socket.on('homelevel', (Lv) => {
-        socketLv = Lv
-        userLvElement.textContent = Lv ? 'Lv.' + Lv : 'Lv is unknown';
-    });
-
-    // 更新用戶角色
-    socket.on('homerole', (role) => {
-        socketrole = role
-        const roleText = role === 'student' ? '學生' : role === 'teacher' ? '教師' : 'role is unknown';
-        userroleElement.textContent = roleText;
-        if (role === 'teacher') {
-            topicElement.style.display = "block";
+    $.ajax({
+        url: '/homeData', // 請將路由設置為返回用戶資料的路由
+        type: 'GET',
+        success: function (data) {
+            // 在這裡處理從後端獲取的資料
+            console.log('用戶資料：', data);
+            usernameElement.textContent = data.Name ? data.Name : 'name is unknown';
+            userLvElement.textContent = data.Lv ? 'Lv.' + data.Lv : 'Lv is unknown';
+            const roleText = data.role === 'student' ? '學生' : data.role === 'teacher' ? '教師' : 'role is unknown';
+            userroleElement.textContent = roleText;
+            if (data.role === 'teacher') {
+                topicElement.style.display = "block";
+            }
+        },
+        error: function (error) {
+            console.error('發生錯誤：', error);
         }
     });
+
+    // Socket.IO 連接
+    const socket = io();
 
     socket.on('newpublic', (newpublic) => {
         const roomElement = document.createElement('div');
@@ -235,15 +221,15 @@
                 const response = await fetch('home/rooms/GoChat', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json' // 设置请求头
+                        'Content-Type': 'application/json'
                     },
                     body: requestBody
                 });
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
-                }
-                window.location.href = `/home/rooms/Room_${roomCode}`;
+                } else
+                    window.location.href = `/home/rooms/Room_${roomCode}`;
             } catch (error) {
                 console.error('Fetch error:', error);
             }
@@ -286,8 +272,8 @@
 
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
-                    }
-                    window.location.href = `/home/rooms/Room_${roomCode}`;
+                    } else
+                        window.location.href = `/home/rooms/Room_${roomCode}`;
                 } catch (error) {
                     console.error('Fetch error:', error);
                 }

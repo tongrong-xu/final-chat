@@ -8,6 +8,20 @@ const auth = require('../middlewares/auth');
 const bodyParser = require('body-parser');
 user.use(bodyParser.json());
 //
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../public/images'))
+    },
+    filename: function (req, file, cb) {
+        const name = Date.now() + '-' + file.originalname
+        cb(null, name)
+    }
+})
+
+const upload = multer({
+    storage: storage
+})
 const UserController = require('../controllers/UserController');
 
 // 首頁
@@ -17,13 +31,13 @@ user.get('/', auth.requireLogout, UserController.loadlogin);
 user.post('/loginstudent', UserController.loginstudent);
 
 // 學生註冊
-user.post('/registerstudent', auth.requireLogout, UserController.registerstudent); // 使用 POST 請求處理註冊
+user.post('/registerstudent', auth.requireLogout, upload.single('image'), UserController.registerstudent); // 使用 POST 請求處理註冊
 
 // 教師登入
 user.post('/loginteacher', UserController.loginteacher);
 
 // 教師註冊
-user.post('/registerteacher', auth.requireLogout, UserController.registerteacher); // 使用 POST 請求處理註冊
+user.post('/registerteacher', auth.requireLogout, upload.single('image'), UserController.registerteacher); // 使用 POST 請求處理註冊
 
 // 登出
 user.get('/logout', auth.requireLogin, UserController.logout);
@@ -31,13 +45,17 @@ user.get('/logout', auth.requireLogin, UserController.logout);
 // 使用者首頁
 user.get('/home', auth.requireLogin, UserController.home);
 
+user.get('/homeData', auth.requireLogin, UserController.homeData);
+
+
 // 導入 RoomRoute 路由
 const RoomRoute = require('./RoomRoute');
+
 user.use('/home/rooms', RoomRoute);
 
 // 首頁
 user.get('*', function (req, res) {
-    res.redirect('/home');
+    res.redirect('/');
 });
 
 module.exports = user;

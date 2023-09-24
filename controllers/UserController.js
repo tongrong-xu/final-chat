@@ -23,12 +23,17 @@ const loginstudent = async (req, res) => {
                 if (userData.role === 'student') {
                     console.log("學生登入");
                     return res.redirect('/home');
+                } else {
+                    res.redirect('/?message=Email%20NG');
+                    console.error('找不到學生使用者或密碼不匹配');
+                    return res.redirect('/');
                 }
             }
+        }else {
+            res.redirect('/?message=Email%20NG');
+            console.error('找不到教師使用者或密碼不匹配');
+            return res.redirect('/');
         }
-        res.redirect('/?message=Email%20NG');
-        console.error('找不到學生使用者或密碼不匹配');
-        return res.redirect('/');
     } catch (error) {
         console.log(error.message);
     }
@@ -55,6 +60,7 @@ const registerstudent = async (req, res) => {
                 const user = new student({
                     name: req.body.username,
                     email: email,
+                    image: 'images/' + req.file.filename,
                     passwordHash: passwordHash,
                     password: req.body.password,
                     role: role
@@ -91,12 +97,17 @@ const loginteacher = async (req, res) => {
                 if (userData.role === 'teacher') {
                     console.log("教師登入");
                     return res.redirect('/home');
+                } else {
+                    res.redirect('/?message=Email%20NG');
+                    console.error('找不到教師使用者或密碼不匹配');
+                    return res.redirect('/');
                 }
             }
+        }else {
+            res.redirect('/?message=Email%20NG');
+            console.error('找不到教師使用者或密碼不匹配');
+            return res.redirect('/');
         }
-        res.redirect('/?message=Email%20NG');
-        console.error('找不到教師使用者或密碼不匹配');
-        return res.redirect('/');
     } catch (error) {
         console.log(error.message);
     }
@@ -123,6 +134,7 @@ const registerteacher = async (req, res) => {
                 const user = new teacher({
                     name: req.body.username,
                     email: email,
+                    image: 'images/' + req.file.filename,
                     passwordHash: passwordHash,
                     password: req.body.password,
                     role: role
@@ -146,14 +158,9 @@ const registerteacher = async (req, res) => {
 const home = async (req, res) => {
     try {
         const role = req.session.user.role;
-        const Lv = req.session.user.Lv;
         const Name = req.session.user.name;
-        sockets.HomeName(Name);
-        sockets.Homerole(role);
-        sockets.HomeLv(Lv);
         const HtmlPath = path.join(__dirname, '..', 'public', 'personal.html');
         if (req.session.user) {
-            //console.log(req.session.user)
             if (role === 'student') {
                 const roomQuery = {
                     $or: [{
@@ -238,6 +245,27 @@ const home = async (req, res) => {
     }
 }
 
+const homeData = (req, res) => {
+    try {
+        if (req.session.user) {
+            const role = req.session.user.role;
+            const Lv = req.session.user.Lv;
+            const Name = req.session.user.name;
+
+            const responseData = {
+                role: role,
+                Lv: Lv,
+                Name: Name
+            };
+
+            res.json(responseData);
+        }
+    } catch (error) {
+        console.log('homeData',error.message);
+    }
+
+}
+
 // 登入頁面載入處理函式
 const loadlogin = async (req, res) => {
     try {
@@ -265,5 +293,6 @@ module.exports = {
     registerteacher,
     loadlogin,
     logout,
-    home
+    home,
+    homeData
 };

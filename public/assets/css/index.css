@@ -104,7 +104,7 @@ main{
     border-radius: 0px 0px 15px 15px;
 }
 input{
-    margin-top: 20px;
+    margin-top: 17px;
     width: 100%;
     border-radius: 10px;
     padding-left: 10px;
@@ -170,4 +170,35 @@ input{
     font-size: 22px;
     color: white;
     font-weight: 600;
+}
+#imgDiv-student{
+    margin: 10px;
+    width: 15vh;
+    height: 15vh;
+    border-radius: 50%;
+    background-color: rgb(106, 66, 29);
+    margin-top: 0;
+}
+#imgDiv-teacher{
+    margin: 10px;
+    width: 15vh;
+    height: 15vh;
+    border-radius: 50%;
+    background-color: rgb(19, 78, 111);
+    margin-top: 0;
+}
+.inputFile{
+    border-radius: 0;
+    border: none;
+    background-color: rgb(24, 18, 18,0);
+    height: 30px;
+    padding: 0;
+    /* color: white; */
+}
+img{
+            
+    width: 15vh;
+    height: 15vh;
+    border-radius: 50%;
+    object-fit: cover;
 }

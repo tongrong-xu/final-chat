@@ -3,26 +3,30 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true // 必填屬性，使用者名稱
+        required: true
     },
     id: {
         type: String,
     },
     email: {
         type: String,
-        required: true // 必填屬性，使用者電子郵件
+        required: true
     },
     passwordHash: {
         type: String,
-        required: true // 必填屬性，使用者密碼
+        required: true
+    },
+    image: {
+        type: String,
+        required: true
     },
     password: {
         type: String,
-        required: true // 必填屬性，使用者密碼
+        required: true
     },
     role: {
         type: String,
-        required: true // 必填屬性，職業
+        required: true
     },
     Lv: {
         type: Number,
@@ -35,11 +39,7 @@ const UserSchema = new mongoose.Schema({
     coin: {
         type: Number,
         default: 0
-    },
-    online: {
-        type: Boolean,
-        default: false 
-    },
+    }
 }, {
     timestamps: true // 自動添加 createdAt 和 updatedAt 欄位
 });
