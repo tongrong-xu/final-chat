@@ -45,6 +45,7 @@ user.get('/logout', auth.requireLogin, UserController.logout);
 // 使用者首頁
 user.get('/home', auth.requireLogin, UserController.home);
 
+
 user.get('/homeData', auth.requireLogin, UserController.homeData);
 
 

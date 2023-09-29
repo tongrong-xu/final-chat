@@ -28,10 +28,14 @@ const loginstudent = async (req, res) => {
                     console.error('找不到學生使用者或密碼不匹配');
                     return res.redirect('/');
                 }
+            } else {
+                res.redirect('/?message=Email%20NG');
+                console.error('找不到學生使用者或密碼不匹配');
+                return res.redirect('/');
             }
-        }else {
+        } else {
             res.redirect('/?message=Email%20NG');
-            console.error('找不到教師使用者或密碼不匹配');
+            console.error('找不到學生使用者或密碼不匹配');
             return res.redirect('/');
         }
     } catch (error) {
@@ -102,8 +106,12 @@ const loginteacher = async (req, res) => {
                     console.error('找不到教師使用者或密碼不匹配');
                     return res.redirect('/');
                 }
+            } else {
+                res.redirect('/?message=Email%20NG');
+                console.error('找不到教師使用者或密碼不匹配');
+                return res.redirect('/');
             }
-        }else {
+        } else {
             res.redirect('/?message=Email%20NG');
             console.error('找不到教師使用者或密碼不匹配');
             return res.redirect('/');
@@ -261,7 +269,7 @@ const homeData = (req, res) => {
             res.json(responseData);
         }
     } catch (error) {
-        console.log('homeData',error.message);
+        console.log('homeData', error.message);
     }
 
 }

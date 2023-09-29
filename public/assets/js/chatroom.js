@@ -297,9 +297,9 @@ $(document).ready(function () {
                             if (data.Name == member.name) {
                                 memberDiv.className = 'col row member-username-self-con';
                                 memberDiv.innerHTML = `
-                                <div class="col-3" id="header">
-                                    <img src="#" alt="">
-                                </div>
+                                <div class="col-3" id="header" style="background-color: green;">
+                                <img src="#" alt="">
+                            </div>
                                 <div class="col-3 member-username-self">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
@@ -333,8 +333,8 @@ $(document).ready(function () {
                             if (data.Name == member.name) {
                                 memberDiv.className = 'col row member-username-self-con';
                                 memberDiv.innerHTML = `
-                                <div class="col-3" id="header">
-                                    <img src="#" alt="">
+                                <div class="col-3" id="header" style="background-color: green;">
+                                <img src="#" alt="" >
                                 </div>
                                 <div class="col-3 member-username-self">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>

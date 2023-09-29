@@ -35,11 +35,11 @@ const create = async (req, res) => {
                 });
                 publicRoom.Menber.push(req.session.user._id);
                 await publicRoom.save();
-                //console.log("newRoom", newRoom)
+
                 if (publicRoom) {
                     var io = req.app.get('socketio');
                     io.emit('newpublic', publicRoom);
-                    //console.log('publicRoom', publicRoom)
+
                 }
                 return res.redirect(`/home/rooms/Room_${roomCode}`);
             } else if (roomType === 'team') {
@@ -52,7 +52,7 @@ const create = async (req, res) => {
                 });
                 teamRoom.Menber.push(req.session.user._id);
                 await teamRoom.save();
-                //console.log("newRoom", teamRoom)
+
                 return res.redirect(`/home/rooms/Room_${roomCode}`);
             } else {
                 return res.redirect(`/home`);
@@ -113,7 +113,7 @@ const joinClassroom = async (req, res) => {
         });
 
         if (room) {
-            //console.log("room", room)
+
             const studentID = req.session.user._id;
             if (!room.Menber.includes(studentID)) {
                 room.Menber.push(studentID);
@@ -168,9 +168,12 @@ const QSbankData = async (req, res) => {
         const qsname = await Questionbank.find({
             MasterName: req.session.user._id
         });
-        res.json({
-            qsname
-        });
+        if (qsname) {
+
+            res.json({
+                qsname
+            });
+        }
     } catch (error) {
         console.log(error.message);
         return res.redirect(`/home`);
@@ -197,9 +200,17 @@ const QuestionBankName = async (req, res) => {
                     Itemname: inputData,
                 });
                 await Question.save();
-                res.json({
-                    Question
-                })
+                if (Question) {
+                    const qsname = await Questionbank.find({
+                        MasterName: req.session.user._id
+                    });
+                    if (qsname) {
+                        console.log("name", qsname)
+                        res.json({
+                            qsname
+                        });
+                    }
+                }
             } else {
                 console.log(error.message);
             }
@@ -253,9 +264,14 @@ const Questiontopic = async (req, res) => {
     try {
         const item = req.body.data;
         const Itemname = await Questionbank.findOne({
-            Itemname: item
+            $and: [{
+                Itemname: item
+            }, {
+                MasterName: req.session.user._id
+            }]
         });
         if (Itemname) {
+            //console.log('Itemname', Itemname)
             const topicview = await topicans.find({
                 $and: [{
                     topic: Itemname.topic
@@ -311,11 +327,18 @@ const QuestionBanktopic = async (req, res) => {
             });
 
             await TopicC.save();
-            
+
             if (TopicC) {
-                console.log('TopicC',TopicC)
+                const topicview = await topicans.find({
+                    $and: [{
+                        topic: Itemname.topic
+                    }, {
+                        MasterName: req.session.user._id
+                    }]
+                });
+                //console.log('topicview', topicview)
                 res.json({
-                    TopicC
+                    topicview
                 })
             }
         }
