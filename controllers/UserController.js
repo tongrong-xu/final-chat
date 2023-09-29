@@ -253,20 +253,39 @@ const home = async (req, res) => {
     }
 }
 
-const homeData = (req, res) => {
+const homeData = async (req, res) => {
     try {
         if (req.session.user) {
             const role = req.session.user.role;
             const Lv = req.session.user.Lv;
             const Name = req.session.user.name;
-
-            const responseData = {
-                role: role,
-                Lv: Lv,
-                Name: Name
-            };
-
-            res.json(responseData);
+            const studentimg = await student.findOne({
+                _id: req.session.user._id
+            });
+            if (studentimg) {
+                console.log("is student", studentimg.image)
+                const responseData = {
+                    role: role,
+                    Lv: Lv,
+                    Name: Name,
+                    img: studentimg.image
+                };
+                res.json(responseData);
+            } else {
+                const teacherimg = await teacher.findOne({
+                    _id: req.session.user._id
+                });
+                if (teacherimg) {
+                    console.log("is teacher", teacherimg.image)
+                    const responseData = {
+                        role: role,
+                        Lv: Lv,
+                        Name: Name,
+                        img: teacherimg.image
+                    };
+                    res.json(responseData);
+                }
+            }
         }
     } catch (error) {
         console.log('homeData', error.message);

@@ -164,7 +164,7 @@ $(document).ready(function () {
     createQusBtn.click(function () {
         const bankname = document.getElementById("bankname").textContent
         if (bankname != "題庫名稱") {
-            console.log(document.getElementById("bankname").textContent)
+            //console.log(document.getElementById("bankname").textContent)
             makeQusCon.show();
             makeQusBg.show();
         }
@@ -178,7 +178,7 @@ $(document).ready(function () {
         let qusBankId = $(this).attr("qusbank-id");
         //取得題目id
         let qusId = $(this).attr("qus-index");
-        console.log(qusBankId + "   " + qusId)
+        //console.log(qusBankId + "   " + qusId)
         makeQusCon.attr("mode", "create");
         makeQusBtn.val("編輯題目");
         makeQusCon.attr("mode", "edit");
@@ -258,6 +258,7 @@ $(document).ready(function () {
         type: 'GET',
         success: function (data) {
             data.qsname.forEach((qusItem, index) => {
+                //console.log(qusItem.topic)
                 CreateQusBankDom(index, {
                     id: index,
                     name: qusItem.Itemname,
@@ -299,7 +300,7 @@ $(document).ready(function () {
                             createDate: formatDate(qusItem.createdAt),
                         });
                     });
-                    console.log(data);
+                    //console.log(data);
                 },
                 error: function (XMLHttpRequest, textStatus) {
                     console.log(XMLHttpRequest);
@@ -307,8 +308,27 @@ $(document).ready(function () {
                 }
             });
         }
-        console.log('qusBankId', qusBankId, 'qusBankname', qusBankname);
+        //console.log('qusBankId', qusBankId, 'qusBankname', qusBankname);
     });
+
+    // 使用事件委托監聽點擊事件
+    BankName.on("click", ".edit-qusbank", function () {
+        // 獲取點擊的編輯按鈕所在的題庫id
+        const qusBankId = $(this).attr("qusbank-id");
+
+        // 找到包含題庫名稱的元素，然後獲取其文本內容
+        const qusBankName = $(this).closest(".qus-bank").find('.qustionbank-text').text();
+
+        $('#origindata').val(qusBankName);
+
+        // 獲取輸入框元素
+        const quesbankInput = $("#quesbank-input");
+
+        // 更改輸入框的 placeholder
+        quesbankInput.attr("placeholder", `請輸入題庫名稱 (${qusBankName})`);
+
+    });
+
 
     makeQusbankBtn.click(function (event) {
         // action為空白，並在這裡把表單傳入後端
@@ -322,10 +342,13 @@ $(document).ready(function () {
                     data: quesbankinput
                 },
                 success: function (data) {
-                    $('.quesbank-input').val('');
+                    BankName.empty()
+                    //console.log('Success:', data);
                     makeQusBankCon.hide();
                     makeQusBg.hide();
-                    BankName.empty()
+                    document.getElementById("quesbank-input").value = ""
+                    document.getElementById("bankname").textContent = item.Itemname
+                    //console.log(data)
                     data.qsname.forEach((qusItem, index) => {
                         CreateQusBankDom(index, {
                             id: index,
@@ -333,9 +356,45 @@ $(document).ready(function () {
                             qusNum: qusItem.topic.length
                         });
                     });
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+                        alert('題庫名稱已存在，請選擇一個不同的名稱。');
+                    }
                 }
             })
-            console.log(quesbankinput)
+        } else if (makeQusbankBtn.val() == "編輯題庫") {
+            const origindata = document.getElementById("origindata").value
+            $.ajax({
+                url: '/home/rooms/BankNameUpdata',
+                type: 'POST',
+                data: {
+                    origindata: origindata,
+                    newdata: quesbankinput
+                },
+                success: function (data) {
+                    document.getElementById("origindata").value = document.getElementById("quesbank-input").value
+                    BankName.empty()
+                    console.log('Success:', data);
+                    makeQusBankCon.hide();
+                    makeQusBg.hide();
+                    document.getElementById("quesbank-input").value = ""
+                    document.getElementById("bankname").textContent = document.getElementById("origindata").value
+                    data.qsname.forEach((qusItem, index) => {
+                        //console.log(qusItem.topic)
+                        CreateQusBankDom(index, {
+                            id: index,
+                            name: qusItem.Itemname,
+                            qusNum: qusItem.topic.length
+                        });
+                    });
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+                        alert('題庫名稱已存在，請選擇一個不同的名稱。');
+                    }
+                }
+            })
         }
     });
 
@@ -344,7 +403,7 @@ $(document).ready(function () {
         const bankname = document.getElementById("bankname").textContent
         if (bankname != "題庫名稱") {
             event.preventDefault();
-            console.log(bankname)
+            //console.log(bankname)
             let formData = {
                 questiontextarea: $('#question-textarea').val(),
                 extradata: bankname,
@@ -400,7 +459,6 @@ $(document).ready(function () {
 
         }
     });
-
 
     //-------------以下為自動創建--------------------
 

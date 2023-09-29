@@ -36,7 +36,7 @@
 
             <div class="col-3" style="display: flex;justify-content: center;align-items: center;">
                 <div class="header">
-                    <img src="" alt="">
+                    <img id="user-image" src="" alt="">
                 </div>
             </div>
 
@@ -179,6 +179,9 @@
         success: function (data) {
             // 在這裡處理從後端獲取的資料
             console.log('用戶資料：', data);
+            const imageUrl = data.img;
+            const userImage = document.getElementById('user-image');
+            userImage.src = imageUrl;
             usernameElement.textContent = data.Name ? data.Name : 'name is unknown';
             userLvElement.textContent = data.Lv ? 'Lv.' + data.Lv : 'Lv is unknown';
             const roleText = data.role === 'student' ? '學生' : data.role === 'teacher' ? '教師' : 'role is unknown';

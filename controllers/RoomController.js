@@ -193,7 +193,12 @@ const QuestionBankName = async (req, res) => {
                     MasterName: req.session.user._id
                 }]
             });
-            if (!qsname) {
+            if (qsname) {
+                console.log('已有名稱');
+                return res.status(400).json({
+                    error: '題庫名稱已存在'
+                });
+            } else if (!qsname) {
                 const Question = new Questionbank({
                     MasterName: req.session.user._id,
                     role: UserRole,
@@ -225,33 +230,69 @@ const QuestionBankName = async (req, res) => {
 
 const BankNameUpdata = async (req, res) => {
     try {
-        const originData = req.body.origin;
-        const inputData = req.body.data;
+        const originData = req.body.origindata;
+        const inputData = req.body.newdata;
         console.log('originData :', originData, 'updata:', inputData);
-        const updatedDocument = await Questionbank.findOneAndUpdate({
+        const qsname = await Questionbank.findOne({
             $and: [{
-                    Itemname: originData
-                },
-                {
-                    MasterName: req.session.user._id
-                }
-            ]
-        }, {
-            $set: {
                 Itemname: inputData
-            }
-        }, {
-            new: true
+            }, {
+                MasterName: req.session.user._id
+            }]
         });
-        if (updatedDocument) {
-            res.json({
-                inputData
+        if (qsname) {
+            console.log('已有名稱');
+            return res.status(400).json({
+                error: '題庫名稱已存在'
             });
-        } else {
-            console.log('未找到');
-            res.json({
-                message: '未找到'
+        } else if (!qsname) {
+            const updatedDocument = await Questionbank.findOneAndUpdate({
+                $and: [{
+                        Itemname: originData
+                    },
+                    {
+                        MasterName: req.session.user._id
+                    }
+                ]
+            }, {
+                $set: {
+                    Itemname: inputData
+                }
+            }, {
+                new: true
             });
+            if (updatedDocument) {
+                const updatetopic = await topicans.updateMany({
+                    $and: [{
+                            Itemname: originData
+                        },
+                        {
+                            MasterName: req.session.user._id
+                        }
+                    ]
+                }, {
+                    $set: {
+                        Itemname: inputData
+                    }
+                }, {
+                    new: true
+                });
+                if (updatetopic) {
+                    const qsname = await Questionbank.find({
+                        MasterName: req.session.user._id
+                    });
+                    if (qsname) {
+                        res.json({
+                            qsname
+                        });
+                    }
+                }
+            } else {
+                console.log('未找到');
+                res.json({
+                    message: '未找到'
+                });
+            }
         }
     } catch (error) {
         console.log(error.message);
@@ -274,6 +315,8 @@ const Questiontopic = async (req, res) => {
             //console.log('Itemname', Itemname)
             const topicview = await topicans.find({
                 $and: [{
+                    Itemname: item
+                }, {
                     topic: Itemname.topic
                 }, {
                     MasterName: req.session.user._id
