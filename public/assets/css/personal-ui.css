@@ -1,71 +1,56 @@
-* {
+*{
     margin: 0;
 }
-
-h1 {
+h1{
     margin: 0;
     margin-right: 35px;
     font-weight: 600;
     font-size: 60px;
 }
-
-h4 {
+h4{
     margin-bottom: 3px;
     font-size: 36px;
 }
-
-#bg {
+#bg{
     background-color: antiquewhite;
     padding: 5vh 7vw;
     height: 100vh;
 }
-
-.header {
-    width: 30vh;
-    height: 30vh;
-    border-radius: 50%; 
-    overflow: hidden; 
+.header{
+    width: 24vh;
+    height: 24vh;
+    border-radius: 1000px;
     background-color: brown;
+    margin-bottom: 10px;
 }
-
-.header img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-}
-.personal-infor {
+.personal-infor{
     display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: center;
     align-items: start;
 }
-
-.name-and-LV {
+.name-and-LV{
     display: flex;
     align-items: end;
     margin-bottom: 50px;
 }
-
-.up-bar-btn-con {
+.up-bar-btn-con{
     display: flex;
     flex-direction: column;
     align-items: end;
     justify-content: space-between;
     height: 100%;
 }
-
-.room-btn {
+.room-btn{
     padding: 3px 20px;
     margin-bottom: 10px;
     border-radius: 10px;
 }
-
-button {
+button{
     font-size: 18px;
 }
-
-.board-con {
+.board-con{
     width: calc(100% - 40px);
     height: calc(100% - 40px);
     background-color: white;
@@ -76,78 +61,172 @@ button {
     overflow: hidden;
     /* overflow-y: auto; */
     max-height: 100%;
-
+    
 }
-
-.board-con-2 {
+.board-con-2{
     width: 100%;
-    height: 100%;
+    height: 91%;
     background-color: white;
     margin: 0px;
     overflow: hidden;
     overflow-y: auto;
-    max-height: 50vh;
+    max-height: 50vh; 
     padding: 0;
+    
+}
+#room-board{
 
 }
+#information-board{
 
-#room-board {}
-
-#information-board {}
-
-.room-board-con {
+}
+.room-board-con{
     width: 100%;
     margin: 0;
     padding: 10px 10px;
     background-color: white;
     font-size: 20px;
     text-align: center;
+    cursor: pointer;
 
 }
-
-#input-room-id {
+#input-room-id{
     border-radius: 100px;
     margin: 10px 10px;
     padding: 0px 10px;
     margin-right: 0;
-    width: calc(100% - 25% - 15px);
-    margin-right: 15px;
+    width: calc(100% - 25% - 25px);
+    margin-right: 20px;
+    margin-left: 15px;
+    font-size: 20px;
 }
-
-#join-room-submit {
+#join-room-submit{
     padding: 2px 10px;
     border-radius: 10px;
-    width: calc(25% - 30px);
+    width: calc(25% - 30px - 11% - 10px);
 }
-
-.align-items-center>* {
+#create-room2{
+    padding: 2px 10px;
+    border-radius: 10px;
+    width: 11%;
+    margin-left: 10px;
+}
+.align-items-center > * {
     text-align: center;
 }
-
-.room-board-con:hover {
+.room-board-con:hover{
     filter: brightness(0.9);
 }
-
-.line-clamp-1 {
+.line-clamp-1{
     display: -webkit-box;
-    -webkit-box-orient: vertical;
-    text-overflow: hidden;
-    overflow: hidden;
+    -webkit-box-orient: vertical; 
+    text-overflow:hidden;
+    overflow:hidden;
     -webkit-line-clamp: 1;
 }
-
-.line-clamp-2 {
+.line-clamp-2{
     display: -webkit-box;
-    -webkit-box-orient: vertical;
-    text-overflow: hidden;
-    overflow: hidden;
+    -webkit-box-orient: vertical; 
+    text-overflow:hidden;
+    overflow:hidden;
     -webkit-line-clamp: 2;
 }
-
-.line-clamp-3 {
+.line-clamp-3{
     display: -webkit-box;
-    -webkit-box-orient: vertical;
-    text-overflow: hidden;
-    overflow: hidden;
+    -webkit-box-orient: vertical; 
+    text-overflow:hidden;
+    overflow:hidden;
     -webkit-line-clamp: 3;
+}
+.header{
+    overflow: hidden;
+}#profile-photo{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+#history-title{
+    width: 100%;
+    height: 9%;
+    font-size: 24px;
+    border-bottom: 1px solid;
+    padding: 7px;
+    padding-left: 40px;
+    font-weight: 600;
+    background-color: whitesmoke;
+}
+#history-infor-title{
+    width: 100%;
+    height: 9%;
+    font-size: 24px;
+    border-bottom: 1px solid;
+    padding: 7px;
+    padding-left: 40px;
+    font-weight: 600;
+    background-color: whitesmoke;
+}
+.replay-information{
+    width: 100%;
+    height: 91%;
+    font-size: 20px;
+}
+
+/* ----------以下創建房間---------- */
+#create-room-con{
+    display: flex;
+    justify-content: center;
+}
+#create-room-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-size: 20px;
+    width: 30%;
+}
+.create-room-type{
+    margin-top: 15px;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+.create-room-permissions{
+    margin-top: 10px;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+.create-room-name{
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 10px;
+}
+.create-room-btn{
+    margin-top: 10px;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+.hr-in-create-room{
+    height: 1px;
+    width: 100%;
+    opacity: 0.9;
+    margin: 5px;
+}
+.btn-in-create-room{
+    padding: 5px 15px;
+    border-radius: 10px;
+}
+/* -------以上創建房間------------- */
+
+#manage-qus-bank-btn{
+    background-color: white;
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 3px 15px;
+    color: black;
+}
+#manage-qus-bank-btn:hover{
+    filter: brightness(0.95);
 }

@@ -11,8 +11,8 @@ $(document).ready(function () {
 
     let nowQusBankId = 1; //目前選擇的題庫id
 
-    function removeWhiteSpace(input) {
-        input.value = input.value.replace(/\s+/g, ''); // 移除所有空格和回車
+    function escapeHtml(html) {
+        return html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     //調用此函數創建題目dom
@@ -34,15 +34,20 @@ $(document).ready(function () {
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading${qusContent["qusIndex"]}">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${qusContent["qusIndex"]}" aria-expanded="true" aria-controls="collapse${qusContent["qusIndex"]}">
-              <div class="edit-qus" edit-mode="false" qusbank-id="${qusContent["qusIndex"]}" style="margin-right: 10px;">
+            <div class="delete-qus-btn">
+            <img src="./assets/icon/delete_FILL0_wght300_GRAD0_opsz40.svg" alt="" width="30px">
+          </div>  
+            <div class="edit-qus" edit-mode="false" qusbank-id="${qusContent["qusIndex"]}" style="margin-right: 10px;">
                 <img class="edit-true" src="./assets/icon/edit_FILL0_wght400_GRAD0_opsz48.svg" alt="" width="30px" >
               </div>  
+
+              
               <div class="create-date">
-              第${qusContent["qusIndex"]+1}題
+              第${qusContent["qusIndex"] + 1}題
                 ${qusContent["createDate"]}
               </div>
               <div class="qus-name">
-                ${qusContent["qustion"]}
+                ${escapeHtml(qusContent["qustion"])}
               </div>
               <input type="text" class="edit-qus-name-input" placeholder="預設名稱" style="display: none;">
               <input type="submit" class="edit-qus-name-submit" value="更改題目" style="display: none;">
@@ -51,10 +56,10 @@ $(document).ready(function () {
             <div id="collapse${qusContent["qusIndex"]}" class="accordion-collapse collapse" aria-labelledby="heading${qusContent["qusIndex"]}" data-bs-parent="#accordionExample">
             <div class="accordion-body">
                 <div class="row">
-                <div class="qus-btn col">${qusContent["option1"]}</div>
-                <div class="qus-btn col">${qusContent["option2"]}</div>
-                <div class="qus-btn col">${qusContent["option3"]}</div>
-                <div class="qus-btn col">${qusContent["option4"]}</div>
+                <div class="qus-btn col">${escapeHtml(qusContent["option1"])}</div>
+                <div class="qus-btn col">${escapeHtml(qusContent["option2"])}</div>
+                <div class="qus-btn col">${escapeHtml(qusContent["option3"])}</div>
+                <div class="qus-btn col">${escapeHtml(qusContent["option4"])}</div>
                 </div>
             </div>
             </div>
@@ -92,16 +97,18 @@ $(document).ready(function () {
         qusNum: 0
     }) {
         qusBankObj["id"] = qusBankId;
-
         let qusBankDom = `
         <!-- 題庫 -->
         <div class="col row align-items-center qus-bank" qusbank-id="${qusBankObj["id"]}">
-            <div class="col-7 line-clamp-1 qustionbank-text">${qusBankObj["name"]}</div>
-            <div class="col-2 line-clamp-1 qustionbank-number">${qusBankObj["qusNum"]}題</div>
+            <div class="col-7 line-clamp-1 qustionbank-text">${escapeHtml(qusBankObj["name"])}</div>
+            <div class="col-2 line-clamp-1 qustionbank-number" value="${qusBankObj["qusNum"]}">${qusBankObj["qusNum"]}題</div>
             <div class="col-3 rank d-flex justify-content-around align-items-center">
                 <div class="edit-qusbank" edit-mode="false" qusbank-id="${qusBankObj["id"]}">
                 <img class="edit-true" src="./assets/icon/edit_FILL0_wght400_GRAD0_opsz48.svg" alt="" width="40px">
                 </div>
+                <div class="delete-qusbank-btn">
+                <img src="./assets/icon/delete_FILL0_wght300_GRAD0_opsz40.svg" alt="" width="38px">
+              </div>
             </div>
         </div>
         <hr style="margin: 0;">
@@ -184,6 +191,33 @@ $(document).ready(function () {
         makeQusCon.attr("mode", "edit");
         makeQusCon.show();
         makeQusBg.show();
+        // 取得題庫id
+
+        // 獲取相應的題目和答案
+        let qusContent = {
+            qustion: $(this).closest(".accordion-header").find(".qus-name").text().trim(),
+            option1: $(this).closest(".accordion-header").next().find(".qus-btn:eq(0)").text(),
+            option2: $(this).closest(".accordion-header").next().find(".qus-btn:eq(1)").text(),
+            option3: $(this).closest(".accordion-header").next().find(".qus-btn:eq(2)").text(),
+            option4: $(this).closest(".accordion-header").next().find(".qus-btn:eq(3)").text()
+        };
+
+        // 在控制台上輸出題目和答案
+        console.log("題目：", qusContent.qustion);
+        console.log("選項1：", qusContent.option1);
+        console.log("選項2：", qusContent.option2);
+        console.log("選項3：", qusContent.option3);
+        console.log("選項4：", qusContent.option4);
+
+        $('#origintextarea').val(qusContent.qustion);
+
+        // 將題目和答案設置為表單元素的值
+        $("#question-textarea").val(qusContent.qustion);
+        $("#opation-name-1").val(qusContent.option1);
+        $("#opation-name-2").val(qusContent.option2);
+        $("#opation-name-3").val(qusContent.option3);
+        $("#opation-name-4").val(qusContent.option4);
+
     }
 
     //編輯題庫視窗
@@ -206,6 +240,13 @@ $(document).ready(function () {
             event.preventDefault();
             makeQusCon.hide();
             makeQusBg.hide();
+            $('#question-textarea').val('');
+            $('#opation-name-1').val('');
+            $('#opation-name-2').val('');
+            $('#opation-name-3').val('');
+            $('#opation-name-4').val('');
+            $('input[name=qus-opation]:checked').prop('checked', false);
+            $('input[name=qus-opation]:checked').val('');
         }
         //如果是編輯題目，關閉時重置回創建
         else if (makeQusCon.attr("mode") == "edit") {
@@ -214,6 +255,13 @@ $(document).ready(function () {
             event.preventDefault();
             makeQusCon.hide();
             makeQusBg.hide();
+            $('#question-textarea').val('');
+            $('#opation-name-1').val('');
+            $('#opation-name-2').val('');
+            $('#opation-name-3').val('');
+            $('#opation-name-4').val('');
+            $('input[name=qus-opation]:checked').prop('checked', false);
+            $('input[name=qus-opation]:checked').val('');
         }
     });
 
@@ -313,8 +361,6 @@ $(document).ready(function () {
 
     // 使用事件委托監聽點擊事件
     BankName.on("click", ".edit-qusbank", function () {
-        // 獲取點擊的編輯按鈕所在的題庫id
-        const qusBankId = $(this).attr("qusbank-id");
 
         // 找到包含題庫名稱的元素，然後獲取其文本內容
         const qusBankName = $(this).closest(".qus-bank").find('.qustionbank-text').text();
@@ -334,131 +380,410 @@ $(document).ready(function () {
         // action為空白，並在這裡把表單傳入後端
         event.preventDefault();
         let quesbankinput = document.getElementById("quesbank-input").value;
-        if (makeQusbankBtn.val() == "創建題庫") {
-            $.ajax({
-                url: '/home/rooms/QuestionBankName',
-                type: 'POST',
-                data: {
-                    data: quesbankinput
-                },
-                success: function (data) {
-                    BankName.empty()
-                    //console.log('Success:', data);
-                    makeQusBankCon.hide();
-                    makeQusBg.hide();
-                    document.getElementById("quesbank-input").value = ""
-                    document.getElementById("bankname").textContent = item.Itemname
-                    //console.log(data)
-                    data.qsname.forEach((qusItem, index) => {
-                        CreateQusBankDom(index, {
-                            id: index,
-                            name: qusItem.Itemname,
-                            qusNum: qusItem.topic.length
+        if (quesbankinput.trim() === "" || quesbankinput.includes(" ")) {
+            alert('題庫名稱內含空格，請重新命名。');
+        } else {
+            if (makeQusbankBtn.val() == "創建題庫") {
+                $.ajax({
+                    url: '/home/rooms/QuestionBankName',
+                    type: 'POST',
+                    data: {
+                        data: quesbankinput
+                    },
+                    success: function (data) {
+                        BankName.empty()
+                        //console.log('Success:', data);
+                        makeQusBankCon.hide();
+                        makeQusBg.hide();
+                        document.getElementById("quesbank-input").value = ""
+                        document.getElementById("bankname").textContent = item.Itemname
+                        //console.log(data)
+                        data.qsname.forEach((qusItem, index) => {
+                            CreateQusBankDom(index, {
+                                id: index,
+                                name: qusItem.Itemname,
+                                qusNum: qusItem.topic.length
+                            });
                         });
-                    });
-                },
-                error: function (xhr) {
-                    if (xhr.status === 400) {
-                        alert('題庫名稱已存在，請選擇一個不同的名稱。');
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 400) {
+                            alert('題庫名稱已存在，請選擇一個不同的名稱。');
+                        }
                     }
-                }
-            })
-        } else if (makeQusbankBtn.val() == "編輯題庫") {
-            const origindata = document.getElementById("origindata").value
-            $.ajax({
-                url: '/home/rooms/BankNameUpdata',
-                type: 'POST',
-                data: {
-                    origindata: origindata,
-                    newdata: quesbankinput
-                },
-                success: function (data) {
-                    document.getElementById("origindata").value = document.getElementById("quesbank-input").value
-                    BankName.empty()
-                    console.log('Success:', data);
-                    makeQusBankCon.hide();
-                    makeQusBg.hide();
-                    document.getElementById("quesbank-input").value = ""
-                    document.getElementById("bankname").textContent = document.getElementById("origindata").value
-                    data.qsname.forEach((qusItem, index) => {
-                        //console.log(qusItem.topic)
-                        CreateQusBankDom(index, {
-                            id: index,
-                            name: qusItem.Itemname,
-                            qusNum: qusItem.topic.length
+                })
+            } else if (makeQusbankBtn.val() == "編輯題庫") {
+                const origindata = document.getElementById("origindata").value
+                $.ajax({
+                    url: '/home/rooms/BankNameUpdata',
+                    type: 'POST',
+                    data: {
+                        origindata: origindata,
+                        newdata: quesbankinput
+                    },
+                    success: function (data) {
+                        document.getElementById("origindata").value = document.getElementById("quesbank-input").value
+                        BankName.empty()
+                        console.log('Success:', data);
+                        makeQusBankCon.hide();
+                        makeQusBg.hide();
+                        document.getElementById("quesbank-input").value = ""
+                        document.getElementById("bankname").textContent = document.getElementById("origindata").value
+                        data.qsname.forEach((qusItem, index) => {
+                            //console.log(qusItem.topic)
+                            CreateQusBankDom(index, {
+                                id: index,
+                                name: qusItem.Itemname,
+                                qusNum: qusItem.topic.length
+                            });
                         });
-                    });
-                },
-                error: function (xhr) {
-                    if (xhr.status === 400) {
-                        alert('題庫名稱已存在，請選擇一個不同的名稱。');
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 400) {
+                            alert('題庫名稱已存在，請選擇一個不同的名稱。');
+                        }
                     }
-                }
-            })
+                })
+            }
         }
     });
 
     makeQusBtn.click(function (event) {
         // action為空白，並在這裡這裡把表單傳入後端
+        event.preventDefault();
         const bankname = document.getElementById("bankname").textContent
-        if (bankname != "題庫名稱") {
-            event.preventDefault();
-            //console.log(bankname)
-            let formData = {
-                questiontextarea: $('#question-textarea').val(),
-                extradata: bankname,
-                qusopation: $('input[name=qus-opation]:checked').val(),
-                opationname1: $('#opation-name-1').val(),
-                opationname2: $('#opation-name-2').val(),
-                opationname3: $('#opation-name-3').val(),
-                opationname4: $('#opation-name-4').val()
-            };
+        if ($('#question-textarea').val() === "" || $('#question-textarea').val().includes(" ") || $('#opation-name-1').val() === "" || $('#opation-name-1').val().includes(" ") || $('#opation-name-2').val() === "" || $('#opation-name-2').val().includes(" ") || $('#opation-name-3').val() === "" || $('#opation-name-3').val().includes(" ") || $('#opation-name-4').val() === "" || $('#opation-name-4').val().includes(" ")) {
+            alert('題庫名稱內含空格，請重新命名。');
+        } else {
+            if (makeQusBtn.val() == "創建題目" && bankname != "題庫名稱") {
+                if ($('input[name=qus-opation]:checked').length > 0) {
+                    let formData = {
+                        questiontextarea: $('#question-textarea').val(),
+                        extradata: bankname,
+                        qusopation: $('input[name=qus-opation]:checked').val(),
+                        opationname1: $('#opation-name-1').val(),
+                        opationname2: $('#opation-name-2').val(),
+                        opationname3: $('#opation-name-3').val(),
+                        opationname4: $('#opation-name-4').val()
+                    };
 
-            $.ajax({
-                url: '/home/rooms/QuestionBanktopic',
-                type: 'POST',
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
-                success: function (data) {
-                    document.getElementById("bankamount").textContent = "題目數量：" + data.topicview.length;
-                    qustionInBank.empty();
-                    makeQusCon.hide();
-                    makeQusBg.hide();
-                    const findBanknum = BankName.find(".qustionbank-text");
-                    $('#question-textarea').val('');
-                    $('#opation-name-1').val('');
-                    $('#opation-name-2').val('');
-                    $('#opation-name-3').val('');
-                    $('#opation-name-4').val('');
-                    $('input[name=qus-opation]:checked').prop('checked', false);
-                    $('input[name=qus-opation]:checked').val('');
-                    data.topicview.forEach((qusItem, index) => {
-                        createQustionDom(index, {
-                            qustion: qusItem.topic,
-                            option1: qusItem.ans[0],
-                            option2: qusItem.ans[1],
-                            option3: qusItem.ans[2],
-                            option4: qusItem.ans[3],
-                            correct: qusItem.correctOption,
-                            qusIndex: index,
-                            createDate: formatDate(qusItem.createdAt),
-                        });
-                    });
-                    findBanknum.each(function () {
-                        if ($(this).text() === bankname) {
-                            const qustionbankNumber = $(this).closest(".qus-bank").find(".qustionbank-number");
-                            qustionbankNumber.text(data.topicview.length + "題");
+                    $.ajax({
+                        url: '/home/rooms/QuestionBanktopic',
+                        type: 'POST',
+                        data: JSON.stringify(formData),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            document.getElementById("bankamount").textContent = "題目數量：" + data.topicview.length;
+                            qustionInBank.empty();
+                            makeQusCon.hide();
+                            makeQusBg.hide();
+                            const findBanknum = BankName.find(".qustionbank-text");
+                            $('#question-textarea').val('');
+                            $('#opation-name-1').val('');
+                            $('#opation-name-2').val('');
+                            $('#opation-name-3').val('');
+                            $('#opation-name-4').val('');
+                            $('input[name=qus-opation]:checked').prop('checked', false);
+                            $('input[name=qus-opation]:checked').val('');
+                            data.topicview.forEach((qusItem, index) => {
+                                createQustionDom(index, {
+                                    qustion: qusItem.topic,
+                                    option1: qusItem.ans[0],
+                                    option2: qusItem.ans[1],
+                                    option3: qusItem.ans[2],
+                                    option4: qusItem.ans[3],
+                                    correct: qusItem.correctOption,
+                                    qusIndex: index,
+                                    createDate: formatDate(qusItem.createdAt),
+                                });
+                            });
+
+                            findBanknum.each(function () {
+                                if ($(this).text() === bankname) {
+                                    const qustionbankNumber = $(this).closest(".qus-bank").find(".qustionbank-number");
+                                    qustionbankNumber.text(data.topicview.length + "題");
+                                }
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus) {
+                            console.log(XMLHttpRequest);
+                            console.log(textStatus);
                         }
                     });
-                },
-                error: function (XMLHttpRequest, textStatus) {
-                    console.log(XMLHttpRequest);
-                    console.log(textStatus);
+                } else {
+                    event.preventDefault();
+                    alert('未選擇選項，請選擇一個答案。');
                 }
-            });
+            } else if (makeQusBtn.val() == "編輯題目" && bankname != "題庫名稱") {
+                event.preventDefault();
+                if ($('input[name=qus-opation]:checked').length > 0) {
+                    let formData = {
+                        questiontextarea: $('#question-textarea').val(),
+                        origintextarea: $('#origintextarea').val(),
+                        extradata: bankname,
+                        qusopation: $('input[name=qus-opation]:checked').val(),
+                        opationname1: $('#opation-name-1').val(),
+                        opationname2: $('#opation-name-2').val(),
+                        opationname3: $('#opation-name-3').val(),
+                        opationname4: $('#opation-name-4').val()
+                    };
 
+                    $.ajax({
+                        url: '/home/rooms/QuestionBanktopicUpdata',
+                        type: 'POST',
+                        data: JSON.stringify(formData),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            document.getElementById("bankamount").textContent = "題目數量：" + data.topicview.length;
+                            qustionInBank.empty();
+                            makeQusCon.hide();
+                            makeQusBg.hide();
+                            const findBanknum = BankName.find(".qustionbank-text");
+                            $('#question-textarea').val('');
+                            $('#opation-name-1').val('');
+                            $('#opation-name-2').val('');
+                            $('#opation-name-3').val('');
+                            $('#opation-name-4').val('');
+                            $('input[name=qus-opation]:checked').prop('checked', false);
+                            $('input[name=qus-opation]:checked').val('');
+                            data.topicview.forEach((qusItem, index) => {
+                                createQustionDom(index, {
+                                    qustion: qusItem.topic,
+                                    option1: qusItem.ans[0],
+                                    option2: qusItem.ans[1],
+                                    option3: qusItem.ans[2],
+                                    option4: qusItem.ans[3],
+                                    correct: qusItem.correctOption,
+                                    qusIndex: index,
+                                    createDate: formatDate(qusItem.createdAt),
+                                });
+                            });
+                            findBanknum.each(function () {
+                                if ($(this).text() === bankname) {
+                                    const qustionbankNumber = $(this).closest(".qus-bank").find(".qustionbank-number");
+                                    qustionbankNumber.text(data.topicview.length + "題");
+                                }
+                            });
+                        },
+                        error: function (XMLHttpRequest, textStatus) {
+                            console.log(XMLHttpRequest);
+                            console.log(textStatus);
+                        }
+                    });
+                } else {
+                    event.preventDefault();
+                    alert('未選擇選項，請選擇一個答案。');
+                }
+            } else {
+                event.preventDefault();
+                alert('出了些錯:(');
+            }
         }
     });
+
+
+
+    //----------刪除題庫----------------------
+    const deleteQusBankCon = $(".delete-quetionbank-con");
+    const deleteQusBankText = $(".delete-qusbank-text");
+    let deleteQusBankBtn = $(".delete-qusbank-btn");
+    const deleteQusBankYes = $("#delete-qusbank-yes");
+    const deleteQusBankBack = $("#delete-qusbank-back");
+
+    const qustionbankCon = $(".qustionbank-con");
+    qustionbankCon.on("click", ".delete-qusbank-btn", deleteQusBankBtnClick);
+
+    //刪除題庫視窗
+    // deleteQusBankBtn.click(deleteQusBankBtnClick);
+
+    function deleteQusBankBtnClick() {
+        //取得題庫id
+        let qusBankId = $(this).closest(".qus-bank")
+            .attr("qusbank-id");
+        //取得題庫名稱
+        let qusBankName = $(this).closest(".qus-bank")
+            .find(".qustionbank-text")
+            .text();
+        //取得題目數量
+        let qusbankNumber = $(this).closest(".qus-bank").find(".qustionbank-number")
+            .attr("value");
+
+        deleteQusBankCon.show();
+        makeQusBg.show();
+        deleteQusBankCon.attr("deleteQusBankId", qusBankId);
+
+        let text =
+            `確定要刪除「${qusBankName}」題庫嗎？<br/>
+        此題庫以及包含在內的${qusbankNumber}個題目將會被移除。`;
+
+        deleteQusBankText.html(text);
+
+        $('#DeleteBankName').val(qusBankName);
+
+    }
+
+    //確認刪除
+    deleteQusBankYes.click(DeleteQusBankYesClick);
+
+    function DeleteQusBankYesClick() {
+        // 取得刪除的題庫id
+        let deleteQusBank = $('#DeleteBankName').val()
+
+        //在這利用id刪除題庫dom
+        console.log(deleteQusBank)
+
+        $.ajax({
+            url: '/home/rooms/QSbankDel',
+            type: 'POST',
+            data: {
+                data: deleteQusBank
+            },
+            success: function (data) {
+                console.log(data)
+                BankName.empty()
+                document.getElementById("bankamount").textContent = "題目數量：0";
+                qustionInBank.empty();
+                document.getElementById("bankname").textContent = "題庫名稱";
+                data.Newqsname.forEach((qusItem, index) => {
+                    CreateQusBankDom(index, {
+                        id: index,
+                        name: qusItem.Itemname,
+                        qusNum: qusItem.topic.length
+                    });
+                });
+            },
+            error: function (xhr) {
+                if (xhr.status === 400) {
+                    alert('錯誤:(');
+                }
+            }
+        });
+
+
+        deleteQusBankCon.hide();
+        makeQusBg.hide();
+    }
+
+    //取消
+    deleteQusBankBack.click(deleteQusBankBackClick);
+
+    function deleteQusBankBackClick() {
+        $('#DeleteBankName').val("");
+        deleteQusBankCon.hide();
+        makeQusBg.hide();
+        deleteQusBankCon.attr("deleteQusBankId", "");
+    }
+
+
+
+    //----------刪除題目------------------
+    const deleteQusCon = $(".delete-quetion-con");
+    const deleteQusText = $(".delete-qus-text");
+    const deleteQusYes = $("#delete-qus-yes");
+    const deleteQusBack = $("#delete-qus-back");
+
+    qustionInBank.on("click", ".delete-qus-btn", deleteQusBtnClick);
+
+    function deleteQusBtnClick() {
+        //取得題庫id
+        let qusBankId = $(this).closest(".accordion-item")
+            .find(".qustion-in-bank")
+            .attr("qusbank-id");
+        //取得題目id
+        let qusId = $(this).closest(".accordion-item")
+            .find(".qus-btn-con")
+            .attr("qus-index");
+        //取得題目名稱
+        let qusBankName = $(this).closest(".accordion-item")
+            .find(".qus-name")
+            .text();
+
+
+        deleteQusCon.show();
+        makeQusBg.show();
+        deleteQusBankCon.attr("deleteQusBankId", qusBankId);
+
+        let text =
+            `確定要刪除「${qusBankName}」這個題目嗎？`;
+
+        deleteQusText.html(text);
+
+        $('#DeleteQuetionName').val(qusBankName.trim());
+    }
+
+    //確認刪除
+    deleteQusYes.click(DeleteQusYesClick);
+
+    function DeleteQusYesClick() {
+        //取得題庫id
+        let qusBankId = $(this).closest(".accordion-item")
+            .find(".qustion-in-bank")
+            .attr("qusbank-id");
+        //取得題目id
+        let qusId = $(this).closest(".accordion-item")
+            .find(".qus-btn-con")
+            .attr("qus-index");
+
+        //在這利用id刪除題庫dom
+
+        let DeleteQuetionName = $('#DeleteQuetionName').val()
+        const bankname = document.getElementById("bankname").textContent
+        let databankname = bankname
+        deleteQusCon.hide();
+        makeQusBg.hide();
+
+        $.ajax({
+            url: '/home/rooms/QSbanktopicDel',
+            type: 'POST',
+            data: JSON.stringify({
+                bankname: databankname,
+                DeleteQuetionName: DeleteQuetionName
+            }),
+
+            contentType: 'application/json',
+            success: function (data) {
+                document.getElementById("bankamount").textContent = "題目數量：" + data.topicview.length;
+                qustionInBank.empty();
+                data.topicview.forEach((qusItem, index) => {
+                    createQustionDom(index, {
+                        qustion: qusItem.topic,
+                        option1: qusItem.ans[0],
+                        option2: qusItem.ans[1],
+                        option3: qusItem.ans[2],
+                        option4: qusItem.ans[3],
+                        correct: qusItem.correctOption,
+                        qusIndex: index,
+                        createDate: formatDate(qusItem.createdAt),
+                    });
+                });
+                const findBanknum = BankName.find(".qustionbank-text");
+                findBanknum.each(function () {
+                    if ($(this).text() === bankname) {
+                        const qustionbankNumber = $(this).closest(".qus-bank").find(".qustionbank-number");
+                        qustionbankNumber.text(data.topicview.length + "題");
+                    }
+                });
+            },
+            error: function (xhr) {
+                if (xhr.status === 400) {
+                    alert('錯誤:(');
+                }
+            }
+        });
+    }
+
+    //取消
+    deleteQusBack.click(deleteQusBackClick);
+
+    function deleteQusBackClick() {
+        $('#DeleteQuetionName').val("");
+        deleteQusCon.hide();
+        makeQusBg.hide();
+        deleteQusCon.attr("deleteQusBankId", "");
+        deleteQusCon.attr("deleteQusId", "");
+    }
+
+
 
     //-------------以下為自動創建--------------------
 

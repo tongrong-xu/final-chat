@@ -5,7 +5,7 @@
     <title>彈幕化遊戲 - 教師頁面</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="version" content="0.40">
+    <meta name="version" content="0.60">
 
     <!-- -------------套件載入-------------- -->
     <link rel="stylesheet" href="./assets/css/suite/bootstrap.min.css">
@@ -32,39 +32,42 @@
 <body>
     <div class="container-fluid" id="bg">
         <!-- ----------------------------上方資訊條---------------------------- -->
-        <div class="row" style="height: calc(37vh - 5vh - 13px);flex-wrap: nowrap;">
+        <div class="row" style="height: calc(31vh - 5vh - 13px);flex-wrap: nowrap;">
 
-            <div class="col-3" style="display: flex;justify-content: center;align-items: center;">
+            <div class="col-2" style="display: flex;justify-content: center;align-items: center;">
                 <div class="header">
-                    <img id="user-image" src="" alt="">
+                    <img src="" alt="" id="profile-photo">
                 </div>
             </div>
 
-            <div class="col-6">
+            <div class="col-7">
                 <div class="personal-infor">
                     <div class="name-and-LV">
                         <h1 id="username"></h1>
                         <h4 style="font-weight: 400;" id="userLv"></h4>
                     </div>
-                    <div class="account-type" style="display: flex;">
-                        <h4 style="font-weight: 600;" id="userrole"></h4>
-                        <a href="/home/rooms/topic" id="topic"
-                            style="margin: 5px 30px;font-size: 24px;text-decoration: none; display: none;">管理題目</a>
+                    <div class="account-type align-items-center d-flex">
+                        <h4 style="font-weight: 600;" id="permission-title">老師</h4>
+                        <a href="/home/rooms/topic" id="manage-qus-bank-btn"
+                            style="margin: 5px 30px;font-size: 24px;text-decoration: none;">管理題目</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-3">
                 <div class="up-bar-btn-con">
-                    <button id="log-out" style="width: auto;margin-top: 60px;background-color:transparent;border: 0;">
-                        <a href="/logout"><span>登出</span></a>
+                    <button id="log-out" style="width: auto;margin-top: 40px;background-color:transparent;border: 0;">
+                        登出
                     </button>
                     <div style="display: flex;flex-direction: column;">
-                        <button id="create-room" class="room-btn">
+                        <!-- <button id="create-room" class="room-btn">
                             創建房間
+                        </button> -->
+                        <button id="open-room-list" class="room-btn">
+                            房間列表
                         </button>
-                        <button id="join-room" class="room-btn">
-                            房間清單
+                        <button id="look-history" class="room-btn">
+                            查看紀錄
                         </button>
                     </div>
 
@@ -73,233 +76,160 @@
         </div>
         <hr style="height: 3px;color: black;opacity: 0.65;margin-top: 15px;margin-bottom: 10px;">
         <!------------------------------- 下方 ------------------------------>
-        <div class="row" style="height: calc(63vh - 5vh - 10px);flex-wrap: nowrap;">
-            <div class="col-6" id="play-record-con">
+        <div class="row justify-content-center" style="height: calc(69vh - 5vh - 10px);flex-wrap: nowrap;">
+
+            <!-- 創建房間、加入房間 -->
+            <div class="col-12" id="room-list-con">
+                <div id="room-list-board" class="board-con">
+
+                    <!-- 創建房間時顯示 -->
+                    <div id="create-room-con" style="display: none;">
+                        <form action="/home/rooms" method="post" id="create-room-form">
+                            <div class="create-room-type">
+                                <label>
+                                    <input type="radio" name="room-type" id="class" value="class" required>全班房間
+                                </label>
+                                <label>
+                                    <input type="radio" name="room-type" id="team" value="team" required>小組房間
+                                </label>
+                                <label>
+                                    <input type="radio" name="room-type" id="personal" value="personal" required>個人房間
+                                </label>
+                            </div>
+                            <hr class="hr-in-create-room">
+                            <div class="create-room-permissions">
+                                <label>
+                                    <input type="radio" name="room-permissions" value="public" id="public" required>公開房間
+                                </label>
+                                <label>
+                                    <input type="radio" name="room-permissions" value="private" id="private" required>私人房間
+                                </label>
+                            </div>
+                            <hr class="hr-in-create-room">
+                            <label for="days">選擇開啟天數：</label>
+                            <select name="days" id="days">
+                                <option value="1">1天</option>
+                                <option value="2">2天</option>
+                                <option value="3">3天</option>
+                                <option value="4">4天</option>
+                                <option value="5">5天</option>
+                                <option value="6">6天</option>
+                                <option value="7">7天</option>
+                                <option value="14">14天</option>
+                            </select>
+                            <hr class="hr-in-create-room">
+                            <input class="create-room-name" type="text" placeholder="輸入房間名稱" name="roomname">
+                            <div class="create-room-btn">
+                                <button type="submit" id="create-room-submit" class="btn-in-create-room">創建房間</button>
+                                <button id="back-to-room-list" class="btn-in-create-room">返回列表</button>
+                            </div>
+
+                        </form>
+                        <!-- 點擊測試後會在加入房間處出現新的房間 -->
+                        <!-- <button id="create-room-submit">測試按鈕</button> -->
+                        <!-- </div> -->
+                    </div>
+
+                    <!-- 加入房間時顯示 -->
+                    <div class="join-room-con" style="display: block;">
+                        <div class="input-room-id-con">
+                            <form id="join" action="/home/rooms/joinClassroom" method="post" style="display: flex;justify-content: center;
+                                align-items: center;width: 100%;padding-left: 0;">
+                                <input id="input-room-id" name="roomCode" type="text" value="" placeholder="請輸入房間號碼">
+                                <button id="join-room-submit" type="submit"> 
+                                    加入房間
+                                </button>
+                                <button id="create-room2">
+                                    創建房間
+                                </button>
+                            </form>
+
+
+                        </div>
+                        <hr style="margin: 0;">
+                        
+                        <div class="board-con-2" id="can-join-room-con">
+                            <!-- 可加入的房間 -->
+                            <div class="col row align-items-center room-board-con canJoinRoom">
+                                <div class="col-2 room-id" room-id="208143">ID:208143</div>
+                                <div class="col-3 room-name line-clamp-1">今天上網頁</div>
+                                <div class="col-2 room-type">小組</div>
+                                <div class="col-3 room-qus-type">老師出題</div>
+                                <div class="col-2 room-people">18/30</div>
+                            </div>
+                            <hr style="margin: 0;">
+                            <!-- 可加入的房間 -->
+                            <div class="col row align-items-center room-board-con canJoinRoom">
+                                <div class="col-2 room-id" room-id="184522">ID:184522</div>
+                                <div class="col-3 room-name line-clamp-1">沒來就當掉</div>
+                                <div class="col-2 room-type">個人</div>
+                                <div class="col-3 room-qus-type">老師出題</div>
+                                <div class="col-2 room-people">12/30</div>
+                            </div>
+                            <hr style="margin: 0;">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 遊玩紀錄 -->
+            <div class="col-6" id="play-record-lsit-con" style="display: none;">
                 <div id="room-board" class="board-con row">
+                    <div id="history-title">
+                        遊玩歷史紀錄
+                    </div>
                     <div class="board-con-2">
                         <!-- 對戰紀錄 -->
                         <div class="col row align-items-center room-board-con roomHistory" room-id="202111">
-                            <div class="col-4 date">2023-06-22</div>
+                            <div class="col-3 date">2023-06-22</div>
+                            <div class="col-3 room-name line-clamp-1">數學課</div>
                             <div class="col-2 room-type">全班</div>
-                            <div class="col-3 room-qus-type">老師出題</div>
-                            <div class="col-3 rank">第2名</div>
+                            <div class="col-2 room-qus-type">老師出題</div>
+                            <div class="col-2 rank">第2名</div>
                         </div>
                         <hr style="margin: 0;">
                         <!-- 對戰紀錄 -->
                         <div class="col row align-items-center room-board-con roomHistory" room-id="242280">
-                            <div class="col-4 date">2023-06-24</div>
+                            <div class="col-3 date">2023-06-24</div>
+                            <div class="col-3 room-name line-clamp-1">英文在這邊英文在這邊</div>
                             <div class="col-2 room-type">個人</div>
-                            <div class="col-3 room-qus-type">老師出題</div>
-                            <div class="col-3 rank">第7名</div>
+                            <div class="col-2 room-qus-type">老師出題</div>
+                            <div class="col-2 rank">第7名</div>
                         </div>
                         <hr style="margin: 0;">
                         <!-- 對戰紀錄 -->
                         <div class="col row align-items-center room-board-con roomHistory" room-id="308421">
-                            <div class="col-4 date">2023-06-28</div>
+                            <div class="col-3 date">2023-06-28</div>
+                            <div class="col-3 room-name line-clamp-1">健康與體育</div>
                             <div class="col-2 room-type">小組</div>
-                            <div class="col-3 room-qus-type">系統出題</div>
-                            <div class="col-3 rank">第9名</div>
+                            <div class="col-2 room-qus-type">系統出題</div>
+                            <div class="col-2 rank">第9名</div>
                         </div>
                         <hr style="margin: 0;">
                     </div>
                 </div>
             </div>
 
-            <!-- 多功能資訊顯示，包括遊玩紀錄、創建房間、加入房間 -->
-            <div class="col-6" id="information-con">
-                <div id="information-board" class="board-con">
-
-                    <!-- 創建房間時顯示 -->
-                    <div class="create-room-con" style="display: none;">
-                        <div style="display: flex;flex-direction: column;padding: 20px;">
-                            <form action="/home/rooms" method="post">
-                                <label>
-                                    <input type="radio" name="room-type" value="public" id="public" checked
-                                        required>公開房間
-                                    <input type="radio" name="room-type" value="team" id="team">私人房間
-                                </label>
-                                <input type="text" placeholder="輸入房間名稱" name="roomname">
-                                <button type="submit">創建房間</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- 加入房間時顯示 -->
-                    <div class="join-room-con" style="display: none;">
-                        <div class="input-room-id-con"
-                            style="display: flex;justify-content: center;align-items: center;">
-                            <form action="/home/rooms/joinClassroom" method="post"
-                                style="width: calc(100% - 25% - 15px);padding-left: 0;">
-                                <input id="input-room-id" name="roomCode" type="text" value="" placeholder="請輸入房間號碼">
-                                <button id="join-room-submit" type="submit">加入房間</button>
-                            </form>
-                        </div>
-                        <hr style="margin: 0;">
-                        <div class="board-con-2" id="can-join-room-con">
-                        </div>
-                    </div>
-
-                    <!-- 顯示遊玩紀錄的詳細資訊 -->
-                    <div class="replay-information" style="display: block;padding: 20px;">
-                        房間紀錄資訊
-                        <div class="room-id">ID:123456</div>
-                        <div class="room-type">小組</div>
-                        <div class="room-qus-type">老師出題</div>
-                        <div class="col-3 room-people">18/30</div>
-                    </div>
-
-
+            <!-- 遊玩紀錄 -->
+            <div class="col-6" id="replay-con" style="display: none;">
+                <div id="replay-board" class="board-con"">
+                    <div id=" history-infor-title">
+                    房間詳細資料
                 </div>
+                <!-- 顯示遊玩紀錄的詳細資訊 -->
+                <div class="replay-information" style="display: block;padding: 20px;">
+                    房間紀錄資訊
+                    <div class="room-name">房間名稱</div>
+                    <div class="room-id">ID:123456</div>
+                    <div class="room-type">小組</div>
+                    <div class="room-qus-type">老師出題</div>
+                    <div class="col-3 room-people">18/30</div>
+                </div>
+
             </div>
         </div>
     </div>
+    </div>
 </body>
-
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    const usernameElement = document.getElementById('username');
-    const userLvElement = document.getElementById('userLv');
-    const userroleElement = document.getElementById('userrole');
-    const roomInfoElement = document.getElementById('can-join-room-con');
-    const topicElement = document.getElementById('topic');
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${month}-${day}`;
-    }
-
-    $.ajax({
-        url: '/homeData', // 請將路由設置為返回用戶資料的路由
-        type: 'GET',
-        success: function (data) {
-            // 在這裡處理從後端獲取的資料
-            console.log('用戶資料：', data);
-            const imageUrl = data.img;
-            const userImage = document.getElementById('user-image');
-            userImage.src = imageUrl;
-            usernameElement.textContent = data.Name ? data.Name : 'name is unknown';
-            userLvElement.textContent = data.Lv ? 'Lv.' + data.Lv : 'Lv is unknown';
-            const roleText = data.role === 'student' ? '學生' : data.role === 'teacher' ? '教師' : 'role is unknown';
-            userroleElement.textContent = roleText;
-            if (data.role === 'teacher') {
-                topicElement.style.display = "block";
-            }
-        },
-        error: function (error) {
-            console.error('發生錯誤：', error);
-        }
-    });
-
-    // Socket.IO 連接
-    const socket = io();
-
-    socket.on('newpublic', (newpublic) => {
-        const roomElement = document.createElement('div');
-        roomElement.className = 'col row align-items-center room-board-con canJoinRoom';
-        roomElement.innerHTML = `
-        <div class="col-2 room-type">${newpublic.state}</div>
-        <div class="col-3 room-id" room-id="${newpublic.RoomCode}">ID:${newpublic.RoomCode}</div>
-        <div class="col-3 room-type">${newpublic.RoomName}</div>
-        <div class="col-2 room-qus-type">${newpublic.MasterName}</div>
-        <div class="col-2 room-people">${formatDate(newpublic.expirationDate)}</div>
-    `;
-
-        const hrElement = document.createElement('hr');
-        hrElement.style.margin = '0';
-
-        // 將 hrElement 附加到 roomElement 內部
-        roomInfoElement.prepend(roomElement);
-        roomElement.appendChild(hrElement);
-        roomElement.addEventListener('click', async () => {
-            try {
-                const roomCode = roomElement.querySelector('.room-id').getAttribute('room-id');
-                const requestData = { roomCode: roomCode };
-                const requestBody = JSON.stringify(requestData);
-
-                const response = await fetch('home/rooms/GoChat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: requestBody
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                } else
-                    window.location.href = `/home/rooms/Room_${roomCode}`;
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        });
-    });
-
-    // 處理獲取房間信息並顯示到前端
-    socket.on('viewcode', (roomInfoArray) => {
-        roomInfoElement.innerHTML = ''; // 清空已有的房間信息
-
-        roomInfoArray.forEach(room => {
-            const roomElement = document.createElement('div');
-            roomElement.className = 'col row align-items-center room-board-con canJoinRoom';
-            roomElement.innerHTML = `
-                <div class="col-2 room-type">${room.state}</div>
-                <div class="col-3 room-id" room-id="${room.RoomCode}">ID:${room.RoomCode}</div>
-                <div class="col-3 room-type">${room.RoomName}</div>
-                <div class="col-2 room-qus-type">${room.teacehr}</div>
-                <div class="col-2 room-people">${formatDate(room.LastUpdatedAt)}</div>
-            `;
-            roomInfoElement.appendChild(roomElement);
-            const hrElement = document.createElement('hr');
-            hrElement.style.margin = '0';
-            roomInfoElement.appendChild(hrElement);
-
-            // 設定點擊事件，跳轉到對應房間
-            roomElement.addEventListener('click', async () => {
-                try {
-                    const roomCode = roomElement.querySelector('.room-id').getAttribute('room-id');
-                    const requestData = { roomCode: roomCode };
-                    const requestBody = JSON.stringify(requestData);
-
-                    const response = await fetch('home/rooms/GoChat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json' // 设置请求头
-                        },
-                        body: requestBody
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    } else
-                        window.location.href = `/home/rooms/Room_${roomCode}`;
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                }
-            });
-        });
-    });
-
-    socket.on('userId', (userId) => {
-        console.log(userId)
-    });
-
-    // 處理 URL 參數
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get('message');
-
-    if (message === 'unknow') {
-        window.alert('找不到房間');
-        window.location.href = '/home';
-    }
-    if (message === 'alreadyjoined') {
-        window.alert('您已經加入過這個房間了');
-        window.location.href = '/home';
-    }
-</script>
-
 </html>

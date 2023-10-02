@@ -12,47 +12,47 @@ const create = async (req, res) => {
     try {
         if (req.session.user) {
             let roomCode;
-            const roomType = req.body['room-type'];
-            const teacherName = req.session.user.name;
+            const roomType = req.body["room-type"];
+            const roomPermissions = req.body["room-permissions"];
             const existingRoom = await Room.findOne({
                 RoomCode: roomCode
             });
             const expirationDate = new Date();
-            expirationDate.setMinutes(expirationDate.getMinutes() + 5);
+            expirationDate.setMinutes(expirationDate.getMinutes() + req.body.days * 24 * 60);
             // 生成唯一的房間代碼
             do {
                 roomCode = generateRoomCode();
             } while (existingRoom);
 
             // 創建新的房間
-            if (roomType === 'public') {
+            if (roomPermissions === 'public') {
                 const publicRoom = new Room({
-                    MasterName: teacherName,
+                    MasterName: req.session.user.name,
                     RoomName: req.body.roomname,
                     RoomCode: roomCode,
-                    state: roomType,
+                    type: roomType,
+                    state: roomPermissions,
                     expirationDate: expirationDate
                 });
                 publicRoom.Menber.push(req.session.user._id);
                 await publicRoom.save();
-
                 if (publicRoom) {
                     var io = req.app.get('socketio');
                     io.emit('newpublic', publicRoom);
 
                 }
                 return res.redirect(`/home/rooms/Room_${roomCode}`);
-            } else if (roomType === 'team') {
+            } else if (roomPermissions === 'private') {
                 const teamRoom = new Room({
                     MasterName: req.session.user.name,
                     RoomName: req.body.roomname,
                     RoomCode: roomCode,
-                    state: roomType,
+                    type: roomType,
+                    state: roomPermissions,
                     expirationDate: expirationDate
                 });
                 teamRoom.Menber.push(req.session.user._id);
                 await teamRoom.save();
-
                 return res.redirect(`/home/rooms/Room_${roomCode}`);
             } else {
                 return res.redirect(`/home`);
@@ -102,6 +102,29 @@ const classroomData = async (req, res) => {
     }
 }
 
+const roomTime = async (req, res) => {
+    try {
+        const code = req.body.data;
+        const room = await Room.findOne({
+            RoomCode: code
+        });
+        if (room) {
+            const time = room.expirationDate
+            res.json({
+                time
+            });
+        }
+        /*if(time){
+            res.json({
+                time
+            })
+        }*/
+    } catch (error) {
+        console.log(error.message);
+        return res.redirect(`/home`);
+    }
+}
+
 
 const joinClassroom = async (req, res) => {
     try {
@@ -113,7 +136,6 @@ const joinClassroom = async (req, res) => {
         });
 
         if (room) {
-
             const studentID = req.session.user._id;
             if (!room.Menber.includes(studentID)) {
                 room.Menber.push(studentID);
@@ -169,7 +191,6 @@ const QSbankData = async (req, res) => {
             MasterName: req.session.user._id
         });
         if (qsname) {
-
             res.json({
                 qsname
             });
@@ -184,7 +205,6 @@ const QuestionBankName = async (req, res) => {
     try {
         const UserRole = req.session.user.role;
         const inputData = req.body.data;
-        console.log('Received data:', inputData);
         if (UserRole === 'teacher') {
             const qsname = await Questionbank.findOne({
                 $and: [{
@@ -210,7 +230,6 @@ const QuestionBankName = async (req, res) => {
                         MasterName: req.session.user._id
                     });
                     if (qsname) {
-                        console.log("name", qsname)
                         res.json({
                             qsname
                         });
@@ -232,7 +251,6 @@ const BankNameUpdata = async (req, res) => {
     try {
         const originData = req.body.origindata;
         const inputData = req.body.newdata;
-        console.log('originData :', originData, 'updata:', inputData);
         const qsname = await Questionbank.findOne({
             $and: [{
                 Itemname: inputData
@@ -301,6 +319,43 @@ const BankNameUpdata = async (req, res) => {
         });
     }
 }
+
+const QSbankDel = async (req, res) => {
+    try {
+        const Del = req.body.data
+        const Removeqsname = await Questionbank.findOneAndRemove({
+            $and: [{
+                Itemname: Del
+            }, {
+                MasterName: req.session.user._id
+            }]
+        });
+        if (Removeqsname) {
+            const deletetopic = await topicans.deleteMany({
+                $and: [{
+                    Itemname: Del
+                }, {
+                    MasterName: req.session.user._id
+                }]
+            });
+            if (deletetopic) {
+                const Newqsname = await Questionbank.find({
+                    MasterName: req.session.user._id
+                });
+
+                if (Newqsname) {
+                    res.json({
+                        Newqsname
+                    });
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.redirect(`/home`);
+    }
+}
+
 const Questiontopic = async (req, res) => {
     try {
         const item = req.body.data;
@@ -312,7 +367,6 @@ const Questiontopic = async (req, res) => {
             }]
         });
         if (Itemname) {
-            //console.log('Itemname', Itemname)
             const topicview = await topicans.find({
                 $and: [{
                     Itemname: item
@@ -323,7 +377,6 @@ const Questiontopic = async (req, res) => {
                 }]
             });
             if (topicview) {
-                //console.log("topicview", topicview)
                 res.json({
                     topicview
                 });
@@ -374,12 +427,13 @@ const QuestionBanktopic = async (req, res) => {
             if (TopicC) {
                 const topicview = await topicans.find({
                     $and: [{
+                        Itemname: extradata
+                    }, {
                         topic: Itemname.topic
                     }, {
                         MasterName: req.session.user._id
                     }]
                 });
-                //console.log('topicview', topicview)
                 res.json({
                     topicview
                 })
@@ -393,6 +447,128 @@ const QuestionBanktopic = async (req, res) => {
     }
 }
 
+const QuestionBanktopicUpdata = async (req, res) => {
+    try {
+        const questiontextarea = req.body.questiontextarea;
+        const origintextarea = req.body.origintextarea;
+        const extradata = req.body.extradata
+        const qusopation = req.body.qusopation
+        const opationname1 = req.body.opationname1
+        const opationname2 = req.body.opationname2
+        const opationname3 = req.body.opationname3
+        const opationname4 = req.body.opationname4
+
+        const Itemname = await Questionbank.findOne({
+            $and: [{
+                Itemname: extradata
+            }, {
+                MasterName: req.session.user._id
+            }]
+        });
+
+        if (Itemname) {
+            const index = Itemname.topic.indexOf(origintextarea);
+            if (index !== -1) {
+                Itemname.topic[index] = questiontextarea;
+                await Itemname.save();
+                if (Itemname) {
+                    const updatedDocument = await topicans.findOneAndUpdate({
+                        $and: [{
+                                Itemname: extradata
+                            },
+                            {
+                                topic: origintextarea
+                            },
+                            {
+                                MasterName: req.session.user._id
+                            }
+                        ]
+                    }, {
+                        $set: {
+                            Itemname: extradata,
+                            topic: questiontextarea,
+                            ans: [opationname1, opationname2, opationname3, opationname4],
+                            correctOption: qusopation
+                        }
+                    }, {
+                        new: true
+                    });
+                    if (updatedDocument) {
+                        const topicview = await topicans.find({
+                            $and: [{
+                                Itemname: extradata
+                            }, {
+                                topic: Itemname.topic
+                            }, {
+                                MasterName: req.session.user._id
+                            }]
+                        });
+                        if (topicview) {
+                            res.json({
+                                topicview
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            error: 'Internal Server Error'
+        });
+    }
+}
+const QSbanktopicDel = async (req, res) => {
+    try {
+        const bankname = req.body.bankname
+        const DeleteQuetionName = req.body.DeleteQuetionName
+        const Removeqsname = await topicans.findOneAndRemove({
+            $and: [{
+                Itemname: bankname
+            }, {
+                topic: DeleteQuetionName
+            }, {
+                MasterName: req.session.user._id
+            }]
+        });
+        if (Removeqsname) {
+            const Itemname = await Questionbank.findOne({
+                $and: [{
+                    Itemname: bankname
+                }, {
+                    MasterName: req.session.user._id
+                }]
+            });
+            if (Itemname) {
+                const index = Itemname.topic.indexOf(DeleteQuetionName);
+                if (index !== -1) {
+                    Itemname.topic.splice(index, 1);
+                    await Itemname.save();
+
+                    const topicview = await topicans.find({
+                        $and: [{
+                            Itemname: bankname
+                        }, {
+                            topic: Itemname.topic
+                        }, {
+                            MasterName: req.session.user._id
+                        }]
+                    });
+                    if (topicview) {
+                        res.json({
+                            topicview
+                        })
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.redirect(`/home`);
+    }
+}
+
 
 module.exports = {
     create,
@@ -402,8 +578,12 @@ module.exports = {
     GoChat,
     topic,
     QSbankData,
+    QSbankDel,
     QuestionBankName,
     BankNameUpdata,
     Questiontopic,
-    QuestionBanktopic
+    QuestionBanktopic,
+    QuestionBanktopicUpdata,
+    QSbanktopicDel,
+    roomTime
 };

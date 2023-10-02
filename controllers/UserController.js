@@ -74,7 +74,7 @@ const registerstudent = async (req, res) => {
 
                 res.redirect('/?message=Email%20pass');
 
-                console.log(user, "學生通過註冊");
+                console.log("學生通過註冊");
             } else {
                 res.redirect('/?message=password%20error');
             }
@@ -172,12 +172,12 @@ const home = async (req, res) => {
             if (role === 'student') {
                 const roomQuery = {
                     $or: [{
-                        Menber: Name
+                        Menber: req.session.user._id
                     }, {
                         MasterName: Name
                     }],
                     $and: [{
-                        state: 'team'
+                        state: 'private'
                     }]
                 };
                 const rooms = await Room.find(roomQuery);
@@ -187,6 +187,7 @@ const home = async (req, res) => {
                 const PublicInfo = PublicRoom.map(room => {
                     return {
                         state: room.state,
+                        type: room.type,
                         RoomCode: room.RoomCode,
                         RoomName: room.RoomName,
                         teacehr: room.MasterName,
@@ -197,6 +198,7 @@ const home = async (req, res) => {
                 const roomInfo = rooms.map(room => {
                     return {
                         state: room.state,
+                        type: room.type,
                         RoomCode: room.RoomCode,
                         RoomName: room.RoomName,
                         teacehr: room.MasterName,
@@ -205,16 +207,24 @@ const home = async (req, res) => {
                 });
 
                 const combinedInfo = PublicInfo.concat(roomInfo);
+                combinedInfo.sort((a, b) => {
+                    // 將日期字符串轉換為日期對象以進行比較
+                    const dateA = new Date(a.LastUpdatedAt);
+                    const dateB = new Date(b.LastUpdatedAt);
+                
+                    // 從最新到最舊進行排序
+                    return dateB - dateA;
+                });
                 sockets.ViewRoomCode(combinedInfo);
             } else if (role === 'teacher') {
                 const roomQuery = {
                     $or: [{
-                        Menber: Name
+                        Menber: req.session.user._id
                     }, {
                         MasterName: Name
                     }],
                     $and: [{
-                        state: 'team'
+                        state: 'private'
                     }]
                 };
                 const rooms = await Room.find(roomQuery);
@@ -224,6 +234,7 @@ const home = async (req, res) => {
                 const PublicInfo = PublicRoom.map(room => {
                     return {
                         state: room.state,
+                        type: room.type,
                         RoomCode: room.RoomCode,
                         RoomName: room.RoomName,
                         teacehr: room.MasterName,
@@ -233,6 +244,7 @@ const home = async (req, res) => {
                 const roomInfo = rooms.map(room => {
                     return {
                         state: room.state,
+                        type: room.type,
                         RoomCode: room.RoomCode,
                         RoomName: room.RoomName,
                         teacehr: room.MasterName,
@@ -240,6 +252,14 @@ const home = async (req, res) => {
                     };
                 });
                 const combinedInfo = PublicInfo.concat(roomInfo);
+                combinedInfo.sort((a, b) => {
+                    // 將日期字符串轉換為日期對象以進行比較
+                    const dateA = new Date(a.LastUpdatedAt);
+                    const dateB = new Date(b.LastUpdatedAt);
+                
+                    // 從最新到最舊進行排序
+                    return dateB - dateA;
+                });
                 sockets.ViewRoomCode(combinedInfo);
             } else {
                 res.redirect('/');
@@ -263,7 +283,6 @@ const homeData = async (req, res) => {
                 _id: req.session.user._id
             });
             if (studentimg) {
-                console.log("is student", studentimg.image)
                 const responseData = {
                     role: role,
                     Lv: Lv,
@@ -276,7 +295,6 @@ const homeData = async (req, res) => {
                     _id: req.session.user._id
                 });
                 if (teacherimg) {
-                    console.log("is teacher", teacherimg.image)
                     const responseData = {
                         role: role,
                         Lv: Lv,

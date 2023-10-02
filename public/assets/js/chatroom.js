@@ -21,8 +21,7 @@ $(document).ready(function () {
     const fullUrl = window.location.href;
     const roomCode = fullUrl.split('/').pop();
     const RoomCode = roomCode.replace('Room_', '');
-    memberListContainer.innerHTML = ''
-
+    memberListContainer.innerHTML = '';
 
     $.ajax({
         url: '/home/rooms/classroomData', // 請將路由設置為返回用戶資料的路由
@@ -308,7 +307,7 @@ $(document).ready(function () {
                             } else {
                                 memberDiv.className = 'col row';
                                 memberDiv.innerHTML = `
-                                <div class="col-3" id="header">
+                                <div class="col-3" id="header" style="background-color: green;">
                                     <img src="#" alt="">
                                 </div>
                                 <div class="col-3 member-username">${member.name}</div>
@@ -364,6 +363,50 @@ $(document).ready(function () {
 
             })
 
+        },
+        error: function (error) {
+            console.error('發生錯誤：', error);
+        }
+    });
+
+    $.ajax({
+        url: '/home/rooms/roomTime',
+        type: 'POST',
+        data: { data: RoomCode },
+        success: function (data) {
+            // 將目標時間解析為 Date 對象
+            const targetDate = new Date(data.time);
+
+            // 更新剩余時間的函數
+            function updateCountdown() {
+                const currentDate = new Date();
+                const timeDifference = targetDate - currentDate;
+
+                if (timeDifference <= 0) {
+                    // 目標時間已過，執行相應操作
+                    clearInterval(interval);
+                    document.getElementById('countdown').innerHTML = "時間已過！";
+
+                    //---socket
+                    socket.on('connect', function () {
+                        socket.emit('overtime');
+                    })
+                } else {
+                    // 計算剩余的小時、分鐘和秒
+                    const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+                    // 在頁面上顯示剩余時間
+                    document.getElementById('countdown').innerHTML = `剩余時間：${hours} 小時 ${minutes} 分鐘 ${seconds} 秒`;
+                }
+            }
+
+            // 頁面加載時啟動倒計時
+            updateCountdown();
+
+            // 每秒更新一次剩余時間
+            const interval = setInterval(updateCountdown, 1000);
         },
         error: function (error) {
             console.error('發生錯誤：', error);

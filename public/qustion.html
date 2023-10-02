@@ -86,28 +86,31 @@
       <div class="make-quetion container-fluid">
         <div class="row w-100">
           <textarea name="question-textarea" id="question-textarea" cols="10" rows="4" placeholder="請輸入題目並選擇正解" required
-            oninput="removeWhiteSpace(this)"></textarea>
+            ></textarea>
         </div>
+
+        <input type="hidden" name="origintextarea" id="origintextarea" value="">
+
         <div class="row" style="padding: 10px 20px;margin-top: 10px;">
           <div class="col-6" style="margin-bottom: 10px;">
             <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-1" value="1" required>
             <input type="text" class="qus-opation-name" name="opation-name-1" id="opation-name-1" placeholder="請輸入選項"
-              required oninput="removeWhiteSpace(this)">
+              required >
           </div>
           <div class="col-6" style="margin-bottom: 10px;">
             <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-2" value="2" required>
             <input type="text" class="qus-opation-name" name="opation-name-2" id="opation-name-2" placeholder="請輸入選項"
-              required oninput="removeWhiteSpace(this)">
+              required >
           </div>
           <div class="col-6">
             <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-3" value="3" required>
             <input type="text" class="qus-opation-name" name="opation-name-3" id="opation-name-3" placeholder="請輸入選項"
-              required oninput="removeWhiteSpace(this)">
+              required >
           </div>
           <div class="col-6">
             <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-4" value="4" required>
             <input type="text" class="qus-opation-name" name="opation-name-4" id="opation-name-4" placeholder="請輸入選項"
-              required oninput="removeWhiteSpace(this)">
+              required>
           </div>
         </div>
         <div class="row w-100" style="justify-content: center;align-items: center;">
@@ -123,7 +126,7 @@
       <div class="make-qusbank container-fluid">
         <div class="row w-100">
           <input type="text" name="quesbank-input" id="quesbank-input" placeholder="請輸入題庫名稱" maxlength="10" required
-            oninput="removeWhiteSpace(this)">
+            >
         </div>
         <input type="hidden" name="origindata" id="origindata" value="">
         <div class="row w-100" style="justify-content: center;align-items: center;">
@@ -133,6 +136,32 @@
       </div>
     </div>
   </form>
+  <!-- ------------------刪除題庫確認視窗--------------------------- -->
+  <div class="delete-quetionbank-con" style="display: none;" deleteQusBankId="0">
+    <div class="delete-qusbank container-fluid">
+      <div class="w-100 delete-qusbank-text">
+        確定要刪除題庫嗎？<br />
+      </div>
+      <input type="hidden" id="DeleteBankName" value="">
+      <div class="row w-100" style="justify-content: center;align-items: center;">
+        <button id="delete-qusbank-yes" class="delete-qusbank-check-btn w-25">確認</button>
+        <button id="delete-qusbank-back" class="delete-qusbank-check-btn w-25">返回</button>
+      </div>
+    </div>
+  </div>
+  <!-- ------------------刪除題目確認視窗--------------------------- -->
+  <div class="delete-quetion-con" style="display: none;" deleteQusBankId="0" deleteQusId="0">
+    <div class="delete-qus container-fluid">
+      <div class="w-100 delete-qus-text">
+        確定要刪除「」這個題目嗎？
+      </div>
+      <input type="hidden" id="DeleteQuetionName" value="">
+      <div class="row w-100" style="justify-content: center;align-items: center;">
+        <button id="delete-qus-yes" class="delete-qusbank-check-btn w-25">確認</button>
+        <button id="delete-qus-back" class="delete-qusbank-check-btn w-25">返回</button>
+      </div>
+    </div>
+  </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
 

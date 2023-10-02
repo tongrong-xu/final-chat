@@ -12,6 +12,8 @@ Room.get('/Room_:roomCode', auth.requireLogin, RoomController.classroom);
 
 Room.get('/classroomData', auth.requireLogin, RoomController.classroomData);
 
+Room.post('/roomTime', auth.requireLogin, RoomController.roomTime);
+
 Room.post('/joinClassroom', auth.requireLogin, RoomController.joinClassroom);
 
 Room.post('/GoChat', auth.requireLogin, RoomController.GoChat);
@@ -20,6 +22,8 @@ Room.get('/topic', auth.requireLogin, auth.isteacher, RoomController.topic);
 
 Room.get('/QSbankData', auth.requireLogin, auth.isteacher, RoomController.QSbankData);
 
+Room.post('/QSbankDel', auth.requireLogin, auth.isteacher, RoomController.QSbankDel);
+
 Room.post('/QuestionBankName', auth.requireLogin, auth.isteacher, RoomController.QuestionBankName);
 
 Room.post('/BankNameUpdata', auth.requireLogin, auth.isteacher, RoomController.BankNameUpdata);
@@ -27,6 +31,10 @@ Room.post('/BankNameUpdata', auth.requireLogin, auth.isteacher, RoomController.B
 Room.post('/Questiontopic', auth.requireLogin, auth.isteacher, RoomController.Questiontopic);
 
 Room.post('/QuestionBanktopic', auth.requireLogin, RoomController.QuestionBanktopic);
+
+Room.post('/QuestionBanktopicUpdata', auth.requireLogin, RoomController.QuestionBanktopicUpdata);
+
+Room.post('/QSbanktopicDel', auth.requireLogin, RoomController.QSbanktopicDel);
 
 Room.use(express.static('public'));
 

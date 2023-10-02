@@ -40,7 +40,7 @@
     <!-- ----------------------------上方資訊條---------------------------- -->
     <div class="up-var">
         <div class="row align-items-center">
-            <div class="col-9"></div>
+            <div class="col-9" id="countdown"></div>    
             <div class="up-text col-1" id="username"></div>
             <div class="up-text col-1" id="userLv"></div>
             <div class="col-1">
@@ -181,45 +181,45 @@
 
     <!-- --------------------出題視窗--------------------- -->
     <form action="" method="get" style="display: none;">
-    <div class="make-quetion-con">
-        <div class="make-quetion container-fluid">
-            <div class="row">
-                <textarea name="question-textarea" id="question-textarea" cols="10" rows="4" 
-                placeholder="請輸入題目並選擇正解" required ></textarea>
-            </div>
-            <div class="row" style="padding: 10px 20px;margin-top: 10px;">
-                <div class="col-6" style="margin-bottom: 10px;">
-                    <input type="radio" class="qus-opation" name="qus-opation" 
-                    id="qus-opation-1" value="1" required >
-                    <input type="text" class="qus-opation-name" name="opation-name-1" 
-                    id="opation-name-1" placeholder="請輸入選項" required >
+        <div class="make-quetion-con">
+            <div class="make-quetion container-fluid">
+                <div class="row">
+                    <textarea name="question-textarea" id="question-textarea" cols="10" rows="4"
+                        placeholder="請輸入題目並選擇正解" required></textarea>
                 </div>
-                <div class="col-6" style="margin-bottom: 10px;">
-                    <input type="radio" class="qus-opation" name="qus-opation" 
-                    id="qus-opation-2" value="2" required >
-                    <input type="text" class="qus-opation-name" name="opation-name-2" 
-                    id="opation-name-2" placeholder="請輸入選項" required >
+                <div class="row" style="padding: 10px 20px;margin-top: 10px;">
+                    <div class="col-6" style="margin-bottom: 10px;">
+                        <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-1" value="1"
+                            required>
+                        <input type="text" class="qus-opation-name" name="opation-name-1" id="opation-name-1"
+                            placeholder="請輸入選項" required>
+                    </div>
+                    <div class="col-6" style="margin-bottom: 10px;">
+                        <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-2" value="2"
+                            required>
+                        <input type="text" class="qus-opation-name" name="opation-name-2" id="opation-name-2"
+                            placeholder="請輸入選項" required>
+                    </div>
+                    <div class="col-6">
+                        <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-3" value="3"
+                            required>
+                        <input type="text" class="qus-opation-name" name="opation-name-3" id="opation-name-3"
+                            placeholder="請輸入選項" required>
+                    </div>
+                    <div class="col-6">
+                        <input type="radio" class="qus-opation" name="qus-opation" id="qus-opation-4" value="4"
+                            required>
+                        <input type="text" class="qus-opation-name" name="opation-name-4" id="opation-name-4"
+                            placeholder="請輸入選項" required>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <input type="radio" class="qus-opation" name="qus-opation" 
-                    id="qus-opation-3" value="3" required >
-                    <input type="text" class="qus-opation-name" name="opation-name-3" 
-                    id="opation-name-3" placeholder="請輸入選項" required >
+                <div class="row" style="justify-content: center;align-items: center;">
+                    <input type="submit" value="發送題目" id="make-qus-btn" class="btn">
+                    <div id="make-qus-btn-t">測試題目</div>
                 </div>
-                <div class="col-6">
-                    <input type="radio" class="qus-opation" name="qus-opation" 
-                    id="qus-opation-4" value="4" required >
-                    <input type="text" class="qus-opation-name" name="opation-name-4" 
-                    id="opation-name-4" placeholder="請輸入選項" required >
-                </div>
-            </div>
-            <div class="row" style="justify-content: center;align-items: center;">
-                <input type="submit" value="發送題目" id="make-qus-btn" class="btn">
-                <div id="make-qus-btn-t">測試題目</div> 
             </div>
         </div>
-    </div>
-</form>
+    </form>
     <!-- -----------------畫布--------------------- -->
     <canvas id="canvas" width="window.width" height="width.height"></canvas>
 </body>
