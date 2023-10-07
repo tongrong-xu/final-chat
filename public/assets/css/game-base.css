@@ -137,3 +137,12 @@ div{
     font-weight: 600;
     font-size: 28px;
 }
+#make-qus-back{
+    margin: 0px;
+    margin-bottom: 0;
+    margin-left: 20px;
+    width: calc(40% - 40px);
+    height: 90%;
+    font-weight: 600;
+    font-size: 28px;
+}

@@ -36,6 +36,8 @@ Room.post('/QuestionBanktopicUpdata', auth.requireLogin, RoomController.Question
 
 Room.post('/QSbanktopicDel', auth.requireLogin, RoomController.QSbanktopicDel);
 
+Room.post('/QusToGame', auth.requireLogin, RoomController.QusToGame);
+
 Room.use(express.static('public'));
 
 module.exports = Room;

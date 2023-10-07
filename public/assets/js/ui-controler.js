@@ -121,6 +121,9 @@ $(document).ready(function(){
         }
         
     });
+
+    
+
     //-------------------------以上為UI折疊--------------------------
 
 
@@ -140,5 +143,24 @@ $(document).ready(function(){
 
     leaveRoom.click(function(){
         console.log("你離開房間了");
+    });
+
+
+    //-----------------打開創建題目面板--------------
+
+    //創建題目
+    let createQusBtn = $(".create-qus");
+    const makeQusCon = $(".make-quetion-con");
+    const makeQusBack = $("#make-qus-back");
+    const makeQusBg = $("#make-qus-bg");
+
+    createQusBtn.click(function(){
+        makeQusCon.show();
+        makeQusBg.show();
+    });
+
+    makeQusBack.click(function(){
+        makeQusCon.hide();
+        makeQusBg.hide();
     });
 });

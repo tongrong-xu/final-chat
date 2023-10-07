@@ -384,7 +384,7 @@ $(document).ready(function () {
 
                 if (timeDifference <= 0) {
                     // 目標時間已過，執行相應操作
-                    clearInterval(interval);
+                    //clearInterval(interval);
                     document.getElementById('countdown').innerHTML = "時間已過！";
 
                     //---socket

@@ -2,6 +2,8 @@ const Room = require("./models/room");
 const student = require("./models/student");
 const teacher = require("./models/teacher");
 const MassageHistory = require("./models/chathistory");
+const Questionbank = require("./models/Questionbank");
+const topic = require("./models/topic");
 const {
     v4: uuidv4
 } = require('uuid');
@@ -30,7 +32,7 @@ const socketOn = function (io) {
         // 發送用戶相關資訊到客戶端
         socket.emit('viewcode', RoomViewCode);
         socket.emit('qsname', qsname);
-
+        //chat
         socket.on('RoomCode', async function (data) {
             if (data) {
                 const checkroom = await Room.findOne({
@@ -102,9 +104,10 @@ const socketOn = function (io) {
                             Online[data.RoomCode].push(teachersOnline)
                         }
                     }
-                    console.log('checkroommember', checkroom.Menber)
-                    io.to(data.RoomCode).emit('RoomMemberOnline', Online[data.RoomCode]);
-                    //------offline`
+                    const sortedOnline = Online[data.RoomCode].sort((a, b) => b.Lv - a.Lv);
+                    //console.log('Online[data.RoomCode]', Online[data.RoomCode])
+                    io.to(data.RoomCode).emit('RoomMemberOnline', sortedOnline);
+                    //------offline
 
                     const studentmember = await student.find({
                         _id: {
@@ -141,6 +144,23 @@ const socketOn = function (io) {
                         io.sockets.to(data.RoomCode).emit('out', data.myName);
                     })
                 }
+            }
+        });
+        //qus
+    
+        socket.on('QusRoomCode', async function (data) {
+            const checkroom = await Room.findOne({
+                RoomCode: data.RoomCode
+            });
+            if (checkroom && new Date() <= checkroom.expirationDate) {
+                socket.on('QusToGame', async function (data) {
+                    // 使用join()方法将数组转换为以逗号分隔的字符串
+                    const selectedQuestions = data.selectedQuestions;
+                    const selectedQusBankParts = data.selectedQusBankParts.join(', ');
+
+                    console.log("selectedQuestions", selectedQuestions);
+                    console.log("selectedQusBankParts", selectedQusBankParts);
+                });
             }
         });
     });

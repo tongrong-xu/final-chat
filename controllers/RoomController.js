@@ -569,6 +569,43 @@ const QSbanktopicDel = async (req, res) => {
     }
 }
 
+const QusToGame = async (req, res) => {
+    try {
+        const selectedQuestions = req.body.selectedQuestions;
+        const selectedQusBankParts = req.body.selectedQusBankParts;
+       // console.log(selectedQuestions, selectedQusBankParts)
+        const Itemname = await Questionbank.findOne({
+            $and: [{
+                Itemname: selectedQusBankParts
+            }, {
+                MasterName: req.session.user._id
+            }]
+        });
+        if (Itemname) {
+            const topicview = await topicans.find({
+                $and: [{
+                    Itemname: selectedQusBankParts
+                }, {
+                    topic: selectedQuestions
+                }, {
+                    MasterName: req.session.user._id
+                }]
+            });
+            if (topicview) {
+                console.log(topicview)
+                res.json({
+                    topicview
+                });
+            }
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            error: 'Internal Server Error'
+        });
+    }
+}
+
 
 module.exports = {
     create,
@@ -585,5 +622,6 @@ module.exports = {
     QuestionBanktopic,
     QuestionBanktopicUpdata,
     QSbanktopicDel,
-    roomTime
+    roomTime,
+    QusToGame
 };

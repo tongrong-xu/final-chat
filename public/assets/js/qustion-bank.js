@@ -146,7 +146,7 @@ $(document).ready(function () {
 
 
     //選擇題庫
-    qusBank.click(qusBankClick);
+    //qusBank.click(qusBankClick);
 
     function qusBankClick() {
         //選擇同一個題庫不會重新載入
@@ -273,6 +273,7 @@ $(document).ready(function () {
 
     //關閉創建題庫
     makeQusBankBack.click(function (event) {
+        $("#quesbank-input").attr("placeholder", `請輸入題庫名稱`);
         if (makeQusBankCon.attr("mode") == "create") {
             event.preventDefault();
             makeQusBankCon.hide();
@@ -322,7 +323,10 @@ $(document).ready(function () {
         const qusBankId = $(this).attr("qusbank-id");
         // 使用 find 方法獲取包含題庫名稱的元素，然後獲取其文本內容
         const qusBankname = $(this).find('.qustionbank-text').text();
-
+        qusBank.each(function () {
+            qusBank.removeClass("qusbank-choose");
+        });
+        $(this).addClass("qusbank-choose");
         document.getElementById("bankname").textContent = qusBankname;
 
         let sendData = {
@@ -368,10 +372,7 @@ $(document).ready(function () {
         $('#origindata').val(qusBankName);
 
         // 獲取輸入框元素
-        const quesbankInput = $("#quesbank-input");
-
-        // 更改輸入框的 placeholder
-        quesbankInput.attr("placeholder", `請輸入題庫名稱 (${qusBankName})`);
+        $("#quesbank-input").attr("placeholder", `請輸入題庫名稱 (${qusBankName})`);
 
     });
 

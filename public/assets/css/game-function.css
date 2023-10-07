@@ -178,3 +178,124 @@ hr{
     font-size: 14px;
     
 }
+
+/* ----------------以下為左邊題目------------------ */
+
+#qustion-parent{
+    background-color: white;
+    border-radius: 10px;
+    /* margin: 15px; */
+    padding: 20px;
+    /* height: calc(100% - 30px); */
+    height: 100%;
+    width: 100%;
+    /* width: calc(100% - 30px); */
+}
+
+#message-con{
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+hr{
+    margin-top: 0px;
+    margin-bottom: 2px;
+}
+.qus-bank{
+    cursor: pointer;
+    user-select: none;
+}
+.qus-left-con{
+    cursor: pointer;
+    user-select: none;
+}
+.qus-bank-name{
+    /* padding-left: 7px; */
+    font-size: 20px;
+    padding-bottom: 3px;
+}
+.qus-left-con{
+    /* padding-left: 7px; */
+    font-size: 20px;
+    padding-bottom: 3px;
+}
+/* .tab-content{ */
+    /* height: 95%; */
+/* } */
+#qustion-Tab-Content{
+    padding: 5px;
+    height: 95%;
+}
+#qustion{
+    height: 100%;
+}
+#qustionbank-con{
+    max-height: calc(100% - 35px);
+    overflow-y: auto;
+    word-break: break-all;
+}
+#message-input{
+    width: 100%;
+    border-radius: 50px;
+    border-style: solid;
+    border-color: #000;
+    padding: 3px;
+    padding-left: 13px;
+    padding-right: 13px;
+    height: 35px;
+}
+.color-btn{
+    margin-right: 5px;
+    border: 1px solid;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+}
+.color-btn:hover{
+    filter: brightness(0.8);
+}
+#down-var{
+    float: right;
+}
+.qus-con{
+    max-height: 100%;
+    overflow-y: auto;
+    word-break: break-all;
+}
+.qusbank-choose{
+    background-color: rgb(217, 227, 241);
+}
+.qus-inleft-parent{
+    max-height: calc(100% - 35px - 36px);
+    height: calc(100% - 35px  - 36px);
+    overflow-y: auto;
+    word-break: break-all;
+}
+.qus-name{
+    font-size: 20px;
+}
+.qus-left-con-choose{
+    background-color: rgb(217, 227, 241);
+}
+#qustionbank-title{
+    background-color: whitesmoke;
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid;
+    padding: 2px;
+}
+#qustion-title{
+    background-color: whitesmoke;
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid;
+    padding: 2px;
+}
+#qustion-left-bottom{
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    padding: 3px;
+    /* position: absolute; */
+    bottom: 0;
+}
