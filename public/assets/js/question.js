@@ -4,49 +4,58 @@ $(document).ready(function () {
     url: '/home/rooms/QSbankData',
     type: 'GET',
     success: function (data) {
-      data.qsname.forEach((qusItem, index) => {
-        CreateQusBankDom(index, {
-          id: index,
-          name: qusItem.Itemname,
-          qusNum: qusItem.topic.length
+      if (data.role == "teacher") {
+        data.qsname.forEach((qusItem, index) => {
+          CreateQusBankDom(index, {
+            id: index,
+            name: qusItem.Itemname,
+            qusNum: qusItem.topic.length
+          });
         });
-      });
+      }
+    },
+    error: function () {
+
     }
   });
 
-  // 您的題目內容
-  var fileContent = `
-  no:1
-  qus:a,
-  option1:b,
-  option2:c,
-  option3:d,
-  option4:e,
-  answer:1
-  ;
-  no:2
-  qus:a2,
-  option1:b2,
-  option2:c2,
-  option3:d2,
-  option4:e2,
-  answer:2
-  ;
-  no:3
-  qus:a3,
-  option1:b3,
-  option2:c3,
-  option3:d3,
-  option4:e3,
-  answer:3
-  ;
-`;
 
-  // 解析題目內容
-  var questions = parseFileContent(fileContent);
-  // console.log(questions);
+  let count = 0;
+  var qustionQueue = $("#nowQus-con");
+  //創建目前已出題題目
+  function CreatNowQusDom(question = {
+    name: "預設題目",
+    index: 0,
+    reslut: "未完成"
+  }) {
 
-  // 解析文本檔內容，將每個題目解析為對象並存入二維陣列中
+    let newQusDom = `
+        <div class="qus-text-con row" style="height:auto" id="${question["index"]}">
+          <div class="col row member-username-con member-con">
+              <div class="qus-text col-9">${question["index"]}.${question["name"]}</div>
+              <div class="qus-text-state col-3">${question["reslut"]}</div>
+          </div>
+          <hr>
+        </div>
+      `;
+
+    qustionQueue.append(newQusDom);
+    // $(outputDiv).append(newQusDom);
+
+    return newQusDom;
+  }
+
+  function changeQueueState(index, state) {
+    let queue = $("#nowQus-con");
+    let selectedElement = queue.find(`#${index}`);
+    if (selectedElement.length) {
+      selectedElement.find(".qus-text-state").text(state);
+    } else {
+      console.error(`Element with index ${index} not found.`);
+    }
+  }
+
+
   function parseFileContent(content) {
     var questionBlocks = content.trim().split(';');
     var questionArray = [];
@@ -74,7 +83,7 @@ $(document).ready(function () {
 
   // 顯示解析後的結果
   var outputDiv = document.getElementById("nowQus-con");
-  questions.forEach(function (question, index) {
+  /*questions.forEach(function (question, index) {
 
     let result = "未完成"; //三種狀態，未完成、完成、進行中
 
@@ -93,36 +102,58 @@ $(document).ready(function () {
   `;
 
     outputDiv.appendChild(questionDiv);
-  });
-
-  //--------出題-------------
-  const qus = $(".qus");
-  const options = $(".options");
-
-  Question();
+  });*/
+  //Question();
 
   //隨機選取題目並顯示在畫面上
-  function Question() {
-    var randomIndex = parseInt(Math.floor(Math.random() * questions.length));
-    qus.text(questions[randomIndex]["qus"]);
-    qus.attr("no", randomIndex + 1);
+  var qusDiv = $(".qus");
+  var options = $(".options");
+  var isAnswerCorrect = false;
+  const useridElement = document.getElementById('myid');
 
-    for (let i = 0; i < 4; i++) {
-      let index = "option" + (i + 1).toString();
-      $(options[i]).text(questions[randomIndex][index]);
+  function Question(data) {
+    //--------出題-------------
+    qusDiv.text(data[0].qus);
+    qusDiv.attr("no", data[0].no); // 設置問題編號
+
+    // 更新選項文本
+    for (var i = 0; i < 4; i++) {
+      var option = data[0]["option" + (i + 1)];
+      $(options[i]).find(".text").text(option);
     }
+
+    let question = {
+      name: data[0].qus,
+      index: data[0].no,
+      reslut: "未完成"
+    };
+    CreatNowQusDom(question);
+
+    // 添加選項的點擊事件處理程序
+    options.click(function (event) {
+      var no = $(this).attr("no"); // 獲取選項編號
+      isAnswerCorrect = true
+      if (no == data[0].answer) {
+        console.log("答對了");
+        changeQueueState(data[0].no, "答對了")
+        socket.emit('qusTrue', {
+          data: data[0],
+          id: useridElement.value,
+          state: 'True'
+        })
+      } else {
+        console.log("答錯了");
+        changeQueueState(data[0].no, "答錯了")
+        socket.emit('qusFalse', {
+          data: data[0],
+          id: useridElement.value,
+          state: 'False'
+        })
+      }
+      options.off("click");
+    });
+
   }
-
-  options.click(function (event) {
-    var no = $(this).attr("no"); //第幾個選項
-    console.log(no);
-    console.log(questions[parseInt(qus.attr("no")) - 1]["answer"]);
-    if (no == questions[parseInt(qus.attr("no")) - 1]["answer"]) {
-      console.log("答對了");
-    } else {
-      console.log("答錯了");
-    }
-  });
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -237,36 +268,7 @@ $(document).ready(function () {
     createDate: "2023-09-13"
   }) {
 
-
     qusContent["qusIndex"] = qusIndex
-
-    // let qusDom =`
-    // <!-- 一個問題 -->
-    // <div class="accordion-item">
-    //     <h2 class="accordion-header" id="heading${qusContent["qusIndex"]}">
-    //     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${qusContent["qusIndex"]}" aria-expanded="true" aria-controls="collapse${qusContent["qusIndex"]}">
-    //       <div class="create-date">
-    //         ${qusContent["createDate"]}
-    //       </div>
-    //       <div class="qus-name">
-    //         ${qusContent["qustion"]}${qusContent["qusIndex"]+1}
-    //       </div>
-    //       <input type="text" class="edit-qus-name-input" placeholder="預設名稱" style="display: none;">
-    //       <input type="submit" class="edit-qus-name-submit" value="更改題目" style="display: none;">
-    //     </button>
-    //     </h2>
-    //     <div id="collapse${qusContent["qusIndex"]}" class="accordion-collapse collapse" aria-labelledby="heading${qusContent["qusIndex"]}" data-bs-parent="#accordionExample">
-    //     <div class="accordion-body">
-    //         <div class="row">
-    //         <div class="qus-btn col">${qusContent["option1"]}</div>
-    //         <div class="qus-btn col">${qusContent["option2"]}</div>
-    //         <div class="qus-btn col">${qusContent["option3"]}</div>
-    //         <div class="qus-btn col">${qusContent["option4"]}</div>
-    //         </div>
-    //     </div>
-    //     </div>
-    // </div>
-    // `;
 
     let qusDom = `
 <!-- 題目 -->
@@ -342,10 +344,39 @@ $(document).ready(function () {
   const fullUrl = window.location.href;
   const roomCode = fullUrl.split('/').pop();
   const RoomCode = roomCode.replace('Room_', '');
-
+  let Data = 0;
+  let topicQuantity = 0;
+  let intervalId;
   socket.emit('QusRoomCode', {
     RoomCode: RoomCode
   })
+
+  $.ajax({
+    url: '/home/rooms/userAnswers ',
+    type: 'POST',
+    data: JSON.stringify({
+      RoomCode: RoomCode
+    }),
+    contentType: 'application/json',
+    success: function (response) {
+      const stateMapping = {
+        True: '答對了',
+        False: '答錯了',
+        Unfinish: '未完成'
+      };
+      response.userAnswersResults.forEach((qusItem) => {
+        topicQuantity++;
+        CreatNowQusDom({
+          index: topicQuantity,
+          name: qusItem.questionText,
+          reslut: stateMapping[qusItem.state] || qusItem.state
+        });
+      });
+    },
+    error: function (error) {
+      console.error('錯：', error);
+    }
+  });
 
   //----------------老師選擇題目並出題--------------
   let qusLeftCon = $(".qus-left-con");
@@ -363,6 +394,34 @@ $(document).ready(function () {
     }
   }
   qusInLeftParent.on("click", ".qus-left-con", qusLeftConClick);
+
+  function sendDataToClients(num, dataBata) {
+    if (Data < num) {
+      socket.emit('dataBata', dataBata[Data]);
+      Data++;
+    } else {
+      Data = 0;
+    }
+  }
+
+
+  function convertDataToText(data) {
+    topicQuantity++;
+    let fileContent = '';
+    fileContent += `no:${topicQuantity}\n`;
+    fileContent += `qus:${data.topic},\n`;
+
+    for (let i = 0; i < data.ans.length; i++) {
+      fileContent += `option${i + 1}:${data.ans[i]},\n`;
+    }
+
+    fileContent += `answer:${data.correctOption}\n`;
+
+    fileContent += ';\n';
+
+    return fileContent;
+  }
+
 
   function SubmitNewQusToGameBtnClick(event) {
     //現在選取
@@ -398,49 +457,46 @@ $(document).ready(function () {
       data: JSON.stringify(requestData),
       contentType: 'application/json',
       success: function (response) {
-        console.log('后端：', response.topicview);
-        
+        console.log('後端：', response.topicview);
+
+        intervalId = setInterval(function () {
+          sendDataToClients(response.topicview.length, response.topicview);
+          isAnswerCorrect = false
+          if (Data == response.topicview.length) {
+            clearInterval(intervalId);
+            socket.emit('noqus')
+          }
+        }, 5000);
       },
       error: function (error) {
         console.error('錯：', error);
       }
     });
-
-
-    CreatNowQusDom();
-
-
-
     //移除選取
+
     nowChooseQus.removeClass("qus-left-con-choose");
   }
 
   socket.on('connect', function () {
-    socket.on('playgame', function () {
-
+    socket.on('playgame', function (data) {
+      let text = convertDataToText(data)
+      var qus = parseFileContent(text)
+      Question(qus)
+      setTimeout(function () {
+        if (!isAnswerCorrect) {
+          console.log('noclick！');
+          options.off("click");
+          socket.emit('qusState', {
+            data: qus[0],
+            id: useridElement.value,
+            state: 'Unfinish'
+          })
+        }
+      }, 4900);
+      console.log(qus)
     });
   });
   //送出已選取的問題
   submitNewQusToGameBtn.click(SubmitNewQusToGameBtnClick);
-  let count = 0;
 
-  //創建目前已出題題目
-  function CreatNowQusDom(question = {
-    name: "預設題目",
-    index: 0,
-    reslut: "未完成"
-  }) {
-
-    let newQusDom = `
-  <div class="qus-text-con row" style="height:auto>
-    <!-- 自己 -->
-    <div class="col row member-username-con" id="member-con">
-        <div class="qus-text col-9">${question["index"]+1}.${question["name"]}</div>
-        <div class="qus-text-state col-3">${question["reslut"]}</div>
-    </div>
-    <hr>
-  </div>
-`;
-    nowQusCon.append(newQusDom);
-  }
 });

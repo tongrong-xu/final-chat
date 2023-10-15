@@ -15,7 +15,7 @@ $(document).ready(function () {
     usernameElement.textContent = ''
     const userLvElement = document.getElementById('userLv');
     const memberListContainer = document.getElementById('members-con');
-
+    const useridElement = document.getElementById('myid');
 
 
     const fullUrl = window.location.href;
@@ -31,7 +31,7 @@ $(document).ready(function () {
             console.log('用戶資料：', data);
             usernameElement.textContent = data.Name ? data.Name : 'name is unknown';
             userLvElement.textContent = data.Lv ? 'Lv.' + data.Lv : 'Lv is unknown';
-
+            useridElement.value = data.id
             //---
             var messageObj = {
                 username: data.Name,
@@ -372,7 +372,9 @@ $(document).ready(function () {
     $.ajax({
         url: '/home/rooms/roomTime',
         type: 'POST',
-        data: { data: RoomCode },
+        data: {
+            data: RoomCode
+        },
         success: function (data) {
             // 將目標時間解析為 Date 對象
             const targetDate = new Date(data.time);

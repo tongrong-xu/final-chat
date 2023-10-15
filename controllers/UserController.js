@@ -172,7 +172,7 @@ const home = async (req, res) => {
             if (role === 'student') {
                 const roomQuery = {
                     $or: [{
-                        Menber: req.session.user._id
+                        Member: req.session.user._id
                     }, {
                         MasterName: Name
                     }],
@@ -219,7 +219,7 @@ const home = async (req, res) => {
             } else if (role === 'teacher') {
                 const roomQuery = {
                     $or: [{
-                        Menber: req.session.user._id
+                        Member: req.session.user._id
                     }, {
                         MasterName: Name
                     }],

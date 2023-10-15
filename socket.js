@@ -111,12 +111,12 @@ const socketOn = function (io) {
 
                     const studentmember = await student.find({
                         _id: {
-                            $in: checkroom.Menber
+                            $in: checkroom.Member
                         }
                     });
                     const teachermember = await teacher.find({
                         _id: {
-                            $in: checkroom.Menber
+                            $in: checkroom.Member
                         }
                     });
                     Member[data.RoomCode] = studentmember.concat(teachermember)
@@ -147,19 +147,59 @@ const socketOn = function (io) {
             }
         });
         //qus
-    
+
         socket.on('QusRoomCode', async function (data) {
             const checkroom = await Room.findOne({
                 RoomCode: data.RoomCode
             });
             if (checkroom && new Date() <= checkroom.expirationDate) {
-                socket.on('QusToGame', async function (data) {
-                    // 使用join()方法将数组转换为以逗号分隔的字符串
-                    const selectedQuestions = data.selectedQuestions;
-                    const selectedQusBankParts = data.selectedQusBankParts.join(', ');
+                socket.join(data.RoomCode);
+                socket.on('dataBata', async function (datas) {
+                    io.sockets.to(data.RoomCode).emit('playgame', datas)
+                    checkroom.questions.push({
+                        questionBankText: datas.Itemname,
+                        questionText: datas.topic,
+                        correctOption: datas.correctOption
+                    })
+                    await checkroom.save()
+                });
 
-                    console.log("selectedQuestions", selectedQuestions);
-                    console.log("selectedQusBankParts", selectedQusBankParts);
+                socket.on('qusState', async function (data) {
+                    console.log("Unfinish");
+                    checkroom.userAnswers.push({
+                        userId: data.id,
+                        questionText: data.data.qus,
+                        state: data.state
+                    })
+                    await checkroom.save()
+                    console.log(checkroom)
+                })
+
+                socket.on('qusTrue', async function (data) {
+                    console.log("True");
+                    checkroom.userAnswers.push({
+                        userId: data.id,
+                        questionText: data.data.qus,
+                        state: data.state
+                    })
+                    await checkroom.save()
+
+                    console.log(checkroom.userAnswers[checkroom.userAnswers.length - 1])
+                });
+
+                socket.on('qusFalse', async function (data) {
+                    console.log("False");
+                    checkroom.userAnswers.push({
+                        userId: data.id,
+                        questionText: data.data.qus,
+                        state: data.state
+                    })
+                    await checkroom.save()
+                    console.log(checkroom.userAnswers[checkroom.userAnswers.length - 1])
+                });
+
+                socket.on('noqus', function () {
+                    console.log("noqus");
                 });
             }
         });

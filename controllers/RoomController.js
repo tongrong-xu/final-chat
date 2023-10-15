@@ -34,7 +34,7 @@ const create = async (req, res) => {
                     state: roomPermissions,
                     expirationDate: expirationDate
                 });
-                publicRoom.Menber.push(req.session.user._id);
+                publicRoom.Member.push(req.session.user._id);
                 await publicRoom.save();
                 if (publicRoom) {
                     var io = req.app.get('socketio');
@@ -51,7 +51,7 @@ const create = async (req, res) => {
                     state: roomPermissions,
                     expirationDate: expirationDate
                 });
-                teamRoom.Menber.push(req.session.user._id);
+                teamRoom.Member.push(req.session.user._id);
                 await teamRoom.save();
                 return res.redirect(`/home/rooms/Room_${roomCode}`);
             } else {
@@ -91,7 +91,8 @@ const classroomData = async (req, res) => {
             const responseData = {
                 role: role,
                 Lv: Lv,
-                Name: Name
+                Name: Name,
+                id: req.session.user._id
             };
 
             res.json(responseData);
@@ -114,11 +115,6 @@ const roomTime = async (req, res) => {
                 time
             });
         }
-        /*if(time){
-            res.json({
-                time
-            })
-        }*/
     } catch (error) {
         console.log(error.message);
         return res.redirect(`/home`);
@@ -137,8 +133,8 @@ const joinClassroom = async (req, res) => {
 
         if (room) {
             const studentID = req.session.user._id;
-            if (!room.Menber.includes(studentID)) {
-                room.Menber.push(studentID);
+            if (!room.Member.includes(studentID)) {
+                room.Member.push(studentID);
                 await room.save();
                 return res.redirect(`/home/rooms/Room_${roomCode}`);
             } else {
@@ -163,8 +159,8 @@ const GoChat = async (req, res) => {
             RoomCode: roomCode
         });
         const studentID = req.session.user._id;
-        if (!room.Menber.includes(studentID)) {
-            room.Menber.push(studentID);
+        if (!room.Member.includes(studentID)) {
+            room.Member.push(studentID);
             await room.save();
         }
         return res.json({
@@ -192,8 +188,32 @@ const QSbankData = async (req, res) => {
         });
         if (qsname) {
             res.json({
-                qsname
+                qsname,
+                role: req.session.user.role
             });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.redirect(`/home`);
+    }
+}
+
+const userAnswers = async (req, res) => {
+    try {
+        const RoomCode = req.body.RoomCode
+        const room = await Room.findOne({
+            RoomCode: RoomCode
+        });
+        const userId = req.session.user._id
+        if (room) {
+            const userAnswersResults = room.userAnswers.filter(answer => answer.userId === userId);
+            if (userAnswersResults) {
+                res.json({
+                    userAnswersResults
+                });
+            }
+        } else {
+            console.log("未找到符合的房間。");
         }
     } catch (error) {
         console.log(error.message);
@@ -573,7 +593,7 @@ const QusToGame = async (req, res) => {
     try {
         const selectedQuestions = req.body.selectedQuestions;
         const selectedQusBankParts = req.body.selectedQusBankParts;
-       // console.log(selectedQuestions, selectedQusBankParts)
+        // console.log(selectedQuestions, selectedQusBankParts)
         const Itemname = await Questionbank.findOne({
             $and: [{
                 Itemname: selectedQusBankParts
@@ -592,7 +612,6 @@ const QusToGame = async (req, res) => {
                 }]
             });
             if (topicview) {
-                console.log(topicview)
                 res.json({
                     topicview
                 });
@@ -615,6 +634,7 @@ module.exports = {
     GoChat,
     topic,
     QSbankData,
+    userAnswers,
     QSbankDel,
     QuestionBankName,
     BankNameUpdata,

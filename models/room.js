@@ -1,5 +1,27 @@
 const mongoose = require('mongoose');
-// 定義使用者的資料庫模型（User Model）
+
+const QuestionSchema = new mongoose.Schema({
+    questionBankText: {
+        type: String,
+    },
+    questionText: {
+        type: String,
+    },
+    correctOption: Number
+});
+
+const UserAnswerSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+    },
+    questionText: {
+        type: String,
+    },
+    state: {
+        type: String,
+    }
+});
+
 const RoomSchema = new mongoose.Schema({
     MasterName: {
         type: String,
@@ -21,15 +43,21 @@ const RoomSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    Menber: [{
+    Member: [{
         type: String
     }],
     expirationDate: {
-        type: Date // 用來儲存房間的有效期
-    }
+        type: Date
+    },
+    topic: {
+        type: String
+    },
+    questions: [QuestionSchema],
+    userAnswers: [UserAnswerSchema]
 }, {
-    timestamps: true // 自動添加 createdAt 和 updatedAt 欄位
+    timestamps: true
 });
 
-// 將 UserSchema 轉為 User Model
-module.exports = mongoose.model('Room', RoomSchema);
+const Room = mongoose.model('Room', RoomSchema);
+
+module.exports = Room;
