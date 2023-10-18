@@ -28,6 +28,9 @@ app.use(session({
   secret: 'cai39kf299fk03k0f29',
   resave: false,
   saveUninitialized: true,
+  cookie: {
+    maxAge: 5 * 60 * 1000
+  }
 }));
 
 

@@ -53,7 +53,11 @@ const RoomSchema = new mongoose.Schema({
         type: String
     },
     questions: [QuestionSchema],
-    userAnswers: [UserAnswerSchema]
+    userAnswers: [UserAnswerSchema],
+    OpenOrClose: {
+        type: String,
+        required: true
+    }
 }, {
     timestamps: true
 });

@@ -397,6 +397,15 @@ $(document).ready(function () {
 
   function sendDataToClients(num, dataBata) {
     if (Data < num) {
+      let counter = 4;
+      const countdown = setInterval(() => {
+        document.getElementById('countdownqus').innerHTML = counter;
+        counter--;
+        if (counter < 0) {
+          clearInterval(countdown);
+          document.getElementById('countdownqus').innerHTML = 'Time is up!';
+        }
+      }, 1000);
       socket.emit('dataBata', dataBata[Data]);
       Data++;
     } else {
@@ -464,6 +473,10 @@ $(document).ready(function () {
           isAnswerCorrect = false
           if (Data == response.topicview.length) {
             clearInterval(intervalId);
+            const countdown = setInterval(() => {
+              clearInterval(countdown);
+              document.getElementById('countdownqus').innerHTML = ' ';
+          }, 1000);
             socket.emit('noqus')
           }
         }, 5000);

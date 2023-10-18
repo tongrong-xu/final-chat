@@ -14,6 +14,7 @@ const create = async (req, res) => {
             let roomCode;
             const roomType = req.body["room-type"];
             const roomPermissions = req.body["room-permissions"];
+            const OpenOrClose = "Open"
             const existingRoom = await Room.findOne({
                 RoomCode: roomCode
             });
@@ -32,7 +33,8 @@ const create = async (req, res) => {
                     RoomCode: roomCode,
                     type: roomType,
                     state: roomPermissions,
-                    expirationDate: expirationDate
+                    expirationDate: expirationDate,
+                    OpenOrClose: OpenOrClose
                 });
                 publicRoom.Member.push(req.session.user._id);
                 await publicRoom.save();

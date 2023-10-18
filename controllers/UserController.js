@@ -22,6 +22,8 @@ const loginstudent = async (req, res) => {
                 req.session.user = userData;
                 if (userData.role === 'student') {
                     console.log("學生登入");
+                    await userData.generateAuthToken()
+
                     return res.redirect('/home');
                 } else {
                     res.redirect('/?message=Email%20NG');
@@ -69,9 +71,6 @@ const registerstudent = async (req, res) => {
                     password: req.body.password,
                     role: role
                 });
-
-                await user.save();
-
                 res.redirect('/?message=Email%20pass');
 
                 console.log("學生通過註冊");
@@ -211,7 +210,7 @@ const home = async (req, res) => {
                     // 將日期字符串轉換為日期對象以進行比較
                     const dateA = new Date(a.LastUpdatedAt);
                     const dateB = new Date(b.LastUpdatedAt);
-                
+
                     // 從最新到最舊進行排序
                     return dateB - dateA;
                 });
@@ -256,7 +255,7 @@ const home = async (req, res) => {
                     // 將日期字符串轉換為日期對象以進行比較
                     const dateA = new Date(a.LastUpdatedAt);
                     const dateB = new Date(b.LastUpdatedAt);
-                
+
                     // 從最新到最舊進行排序
                     return dateB - dateA;
                 });
@@ -324,6 +323,7 @@ const loadlogin = async (req, res) => {
 const logout = async (req, res) => {
     try {
         req.session.destroy(); // 清除session
+        req.user.tokens = []
         res.redirect('/'); // 重定向到首頁
         console.log("登出");
     } catch (error) {

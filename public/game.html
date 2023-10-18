@@ -40,7 +40,7 @@
     <div id="make-qus-bg" style="display: none;"></div>
     <div id="myid" value=""></div>
     <!-- ----------------------------上方資訊條---------------------------- -->
-    <div class="up-var">
+    <div class="up-var"> 
         <div class="row align-items-center">
             <div class="col-9" id="countdown"></div>    
             <div class="up-text col-1" id="username"></div>
@@ -124,12 +124,13 @@
 
                 <!-- ----------------------------目前出題---------------------------- -->
                 <div class="tab-pane fade" id="nowQus" role="tabpanel" aria-labelledby="nowQus-tab">
-                    <div class="" style="height: calc(100% - 10px);">
-                        <div class="flex-column" id="nowQus-con" style="height: auto;">
+                    <div style="height: calc(100% - 10px); overflow: auto;">
+                        <div class="flex-column" id="nowQus-con">
                             <!-- 此處會js更新進行中以及答題過的題目 -->
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -184,7 +185,6 @@
             </div>
         </div>
     </div>
-
     <!-- ----------------------------答題---------------------------- -->
     <div class="qus-con" style="display: flex;flex-direction: column;">
         <div class="qus" no="">
