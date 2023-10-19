@@ -23,7 +23,6 @@ const loginstudent = async (req, res) => {
                 if (userData.role === 'student') {
                     console.log("學生登入");
                     await userData.generateAuthToken()
-
                     return res.redirect('/home');
                 } else {
                     res.redirect('/?message=Email%20NG');
@@ -71,6 +70,8 @@ const registerstudent = async (req, res) => {
                     password: req.body.password,
                     role: role
                 });
+
+                await user.save();
                 res.redirect('/?message=Email%20pass');
 
                 console.log("學生通過註冊");
@@ -323,7 +324,11 @@ const loadlogin = async (req, res) => {
 const logout = async (req, res) => {
     try {
         req.session.destroy(); // 清除session
-        req.user.tokens = []
+        console.log('tokens', req.user)
+        if (req.user && req.user.tokens) {
+            console.log('tokens', req.user.tokens)
+            req.user.tokens = []
+        }
         res.redirect('/'); // 重定向到首頁
         console.log("登出");
     } catch (error) {

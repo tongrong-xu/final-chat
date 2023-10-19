@@ -1,3 +1,4 @@
+//student.js
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken')
 const UserSchema = new mongoose.Schema({
@@ -42,10 +43,10 @@ const UserSchema = new mongoose.Schema({
     },
     tokens: [{
         token: {
-          type: String,
-          required: true
+            type: String,
+            required: true
         }
-      }],
+    }],
 }, {
     timestamps: true
 });
@@ -57,7 +58,6 @@ UserSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({
         _id: user._id.toString()
     }, 'thisismyproject')
-    // 將該 token 存入資料庫中：讓使用者能跨裝置登入及登出
     user.tokens = user.tokens.concat({
         token
     })
