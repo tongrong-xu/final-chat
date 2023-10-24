@@ -1,15 +1,5 @@
 const mongoose = require('mongoose');
 
-const QuestionSchema = new mongoose.Schema({
-    questionBankText: {
-        type: String,
-    },
-    questionText: {
-        type: String,
-    },
-    correctOption: Number
-});
-
 const UserAnswerSchema = new mongoose.Schema({
     userId: {
         type: String,
@@ -20,6 +10,27 @@ const UserAnswerSchema = new mongoose.Schema({
     state: {
         type: String,
     }
+});
+
+const QuestionSchema = new mongoose.Schema({
+    questionBankText: {
+        type: String,
+    },
+    questionText: {
+        type: String,
+    },
+    correctOption: Number,
+    userAnswers: [UserAnswerSchema],
+    Truepercent: {
+        type: String,
+    },
+    Falsepercent: {
+        type: String,
+    },
+    Unfinishpercent: {
+        type: String,
+    },
+
 });
 
 const RoomSchema = new mongoose.Schema({
@@ -52,16 +63,10 @@ const RoomSchema = new mongoose.Schema({
     topic: {
         type: String
     },
-    questions: [QuestionSchema],
-    userAnswers: [UserAnswerSchema],
-    OpenOrClose: {
-        type: String,
-        required: true
-    }
+    questions: [QuestionSchema]
 }, {
     timestamps: true
 });
 
-const Room = mongoose.model('Room', RoomSchema);
 
-module.exports = Room;
+module.exports = mongoose.model('Room', RoomSchema);

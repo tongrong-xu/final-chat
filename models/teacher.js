@@ -39,10 +39,27 @@ const UserSchema = new mongoose.Schema({
     coin: {
         type: Number,
         default: 0
-    }
+    }, token: {
+        type: String,
+        default: null
+    },
 }, {
     timestamps: true // 自動添加 createdAt 和 updatedAt 欄位
 });
+
+
+UserSchema.methods.delAuthToken = async function () {
+    const user = this
+    user.token = null
+    await user.save()
+}
+
+UserSchema.methods.generateAuthToken = async function (token) {
+    const user = this
+    user.token = token
+    await user.save()
+}
+
 
 // 將 UserSchema 轉為 User Model
 module.exports = mongoose.model('teacher', UserSchema);

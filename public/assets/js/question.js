@@ -1,5 +1,6 @@
 $(document).ready(function () {
   const socket = io();
+  let Isteacher = false
   $.ajax({
     url: '/home/rooms/QSbankData',
     type: 'GET',
@@ -12,6 +13,7 @@ $(document).ready(function () {
             qusNum: qusItem.topic.length
           });
         });
+        Isteacher = true
       }
     },
     error: function () {
@@ -132,7 +134,6 @@ $(document).ready(function () {
     // 添加選項的點擊事件處理程序
     options.click(function (event) {
       var no = $(this).attr("no"); // 獲取選項編號
-      isAnswerCorrect = true
       if (no == data[0].answer) {
         console.log("答對了");
         changeQueueState(data[0].no, "答對了")
@@ -141,6 +142,7 @@ $(document).ready(function () {
           id: useridElement.value,
           state: 'True'
         })
+        isAnswerCorrect = true
       } else {
         console.log("答錯了");
         changeQueueState(data[0].no, "答錯了")
@@ -149,10 +151,19 @@ $(document).ready(function () {
           id: useridElement.value,
           state: 'False'
         })
+        isAnswerCorrect = true
       }
       options.off("click");
     });
-
+    if (Isteacher) {
+      setTimeout(function () {
+        socket.emit('qusState', {
+          data: data[0],
+          id: useridElement.value,
+          state: 'Unfinish'
+        })
+      }, 10000);
+    }
   }
 
   function formatDate(dateString) {
@@ -352,7 +363,7 @@ $(document).ready(function () {
   })
 
   $.ajax({
-    url: '/home/rooms/userAnswers ',
+    url: '/home/rooms/userAnswers',
     type: 'POST',
     data: JSON.stringify({
       RoomCode: RoomCode
@@ -397,15 +408,6 @@ $(document).ready(function () {
 
   function sendDataToClients(num, dataBata) {
     if (Data < num) {
-      let counter = 4;
-      const countdown = setInterval(() => {
-        document.getElementById('countdownqus').innerHTML = counter;
-        counter--;
-        if (counter < 0) {
-          clearInterval(countdown);
-          document.getElementById('countdownqus').innerHTML = 'Time is up!';
-        }
-      }, 1000);
       socket.emit('dataBata', dataBata[Data]);
       Data++;
     } else {
@@ -473,13 +475,9 @@ $(document).ready(function () {
           isAnswerCorrect = false
           if (Data == response.topicview.length) {
             clearInterval(intervalId);
-            const countdown = setInterval(() => {
-              clearInterval(countdown);
-              document.getElementById('countdownqus').innerHTML = ' ';
-          }, 1000);
             socket.emit('noqus')
           }
-        }, 5000);
+        }, 12000);
       },
       error: function (error) {
         console.error('錯：', error);
@@ -499,14 +497,16 @@ $(document).ready(function () {
         if (!isAnswerCorrect) {
           console.log('noclick！');
           options.off("click");
-          socket.emit('qusState', {
-            data: qus[0],
-            id: useridElement.value,
-            state: 'Unfinish'
-          })
         }
-      }, 4900);
+      }, 10000);
       console.log(qus)
+      if (Isteacher) {
+        socket.off('percent'); // 移除之前的監聽器
+        socket.on('percent', function (data) {
+          console.log('percent', data)
+        });
+      }
+      
     });
   });
   //送出已選取的問題

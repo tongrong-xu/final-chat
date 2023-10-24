@@ -1,4 +1,4 @@
-//auth.js
+
 const requireLogin = (req, res, next) => {
     try {
         if (req.session.user) {
@@ -58,9 +58,10 @@ const isstudent = (req, res, next) => {
     }
 }
 
+
 module.exports = {
     requireLogin,
     requireLogout,
     isteacher,
-    isstudent
+    isstudent,
 };

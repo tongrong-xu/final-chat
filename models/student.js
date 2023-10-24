@@ -41,29 +41,24 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    tokens: [{
-        token: {
-            type: String,
-            required: true
-        }
-    }],
+    token: {
+        type: String,
+        default: null
+    },
 }, {
     timestamps: true
 });
 
-UserSchema.methods.generateAuthToken = async function () {
-    // this 指向當前的使用者實例
+UserSchema.methods.delAuthToken = async function () {
     const user = this
-    // 產生一組 JWT
-    const token = jwt.sign({
-        _id: user._id.toString()
-    }, 'thisismyproject')
-    user.tokens = user.tokens.concat({
-        token
-    })
+    user.token = null
     await user.save()
-    // 回傳 JWT
-    return token
+}
+
+UserSchema.methods.generateAuthToken = async function (token) {
+    const user = this
+    user.token = token
+    await user.save()
 }
 
 module.exports = mongoose.model('student', UserSchema);

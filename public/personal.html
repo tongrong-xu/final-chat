@@ -102,7 +102,8 @@
                                     <input type="radio" name="room-permissions" value="public" id="public" required>公開房間
                                 </label>
                                 <label>
-                                    <input type="radio" name="room-permissions" value="private" id="private" required>私人房間
+                                    <input type="radio" name="room-permissions" value="private" id="private"
+                                        required>私人房間
                                 </label>
                             </div>
                             <hr class="hr-in-create-room">
@@ -136,7 +137,7 @@
                             <form id="join" action="/home/rooms/joinClassroom" method="post" style="display: flex;justify-content: center;
                                 align-items: center;width: 100%;padding-left: 0;">
                                 <input id="input-room-id" name="roomCode" type="text" value="" placeholder="請輸入房間號碼">
-                                <button id="join-room-submit" type="submit"> 
+                                <button id="join-room-submit" type="submit">
                                     加入房間
                                 </button>
                                 <button id="create-room2">
@@ -147,7 +148,7 @@
 
                         </div>
                         <hr style="margin: 0;">
-                        
+
                         <div class="board-con-2" id="can-join-room-con">
                             <!-- 可加入的房間 -->
                             <div class="col row align-items-center room-board-con canJoinRoom">
@@ -232,4 +233,6 @@
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+
 </html>

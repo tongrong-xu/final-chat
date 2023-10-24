@@ -163,39 +163,87 @@ const socketOn = function (io) {
                     })
                     await checkroom.save()
                 });
-
-                socket.on('qusState', async function (data) {
-                    console.log("Unfinish");
-                    checkroom.userAnswers.push({
-                        userId: data.id,
-                        questionText: data.data.qus,
-                        state: data.state
-                    })
-                    await checkroom.save()
-                    console.log(checkroom)
-                })
-
-                socket.on('qusTrue', async function (data) {
+                socket.on('qusTrue', async function (dataTrue) {
                     console.log("True");
-                    checkroom.userAnswers.push({
-                        userId: data.id,
-                        questionText: data.data.qus,
-                        state: data.state
-                    })
+                    const checkroom = await Room.findOne({
+                        RoomCode: data.RoomCode
+                    });
+                    const QUE = checkroom.questions[checkroom.questions.length - 1];
+                    QUE.userAnswers.push({
+                        userId:dataTrue.id,
+                        questionText: dataTrue.data.qus,
+                        state: dataTrue.state
+                    });
                     await checkroom.save()
-
-                    console.log(checkroom.userAnswers[checkroom.userAnswers.length - 1])
                 });
 
-                socket.on('qusFalse', async function (data) {
+                socket.on('qusFalse', async function (dataFalse) {
                     console.log("False");
-                    checkroom.userAnswers.push({
-                        userId: data.id,
-                        questionText: data.data.qus,
-                        state: data.state
-                    })
+                    const checkroom = await Room.findOne({
+                        RoomCode: data.RoomCode
+                    });
+                    const QUE = checkroom.questions[checkroom.questions.length - 1];
+                    QUE.userAnswers.push({
+                        userId: dataFalse.id,
+                        questionText: dataFalse.data.qus,
+                        state: dataFalse.state
+                    });
                     await checkroom.save()
-                    console.log(checkroom.userAnswers[checkroom.userAnswers.length - 1])
+                });
+
+                socket.on('qusState', async function (dataState) {
+                    const checkroom = await Room.findOne({
+                        RoomCode: data.RoomCode
+                    });
+                    const QUE = checkroom.questions[checkroom.questions.length - 1];
+                    const question = dataState.data.qus;
+                    const state = dataState.state;
+                    checkroom.Member.forEach(member => {
+                        const existingUserAnswer = QUE.userAnswers.find(answer => answer.userId === member && answer.questionText === question);
+                        if (!existingUserAnswer) {
+                            QUE.userAnswers.push({
+                                userId: member,
+                                questionText: question,
+                                state: state
+                            });
+                        }
+                    });
+
+                    // 計算答題狀況的百分比
+                    const userAnswersCount = {};
+                    checkroom.Member.forEach(member => {
+                        userAnswersCount[member] = {
+                            True: QUE.userAnswers.filter(answer => answer.userId === member && answer.state === 'True').length,
+                            False: QUE.userAnswers.filter(answer => answer.userId === member && answer.state === 'False').length,
+                            Unfinish: QUE.userAnswers.filter(answer => answer.userId === member && answer.state === 'Unfinish').length,
+                        };
+                    });
+
+                    // 更新每個問題的答題狀況
+                    QUE.userAnswers.forEach(answer => {
+                        answer.Truepercent = userAnswersCount[answer.userId].True ;
+                        answer.Falsepercent = userAnswersCount[answer.userId].False ;
+                        answer.Unfinishpercent = userAnswersCount[answer.userId].Unfinish ;
+                    });
+
+                    await checkroom.save();
+
+                    const trueUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'True').length;
+                    const FalseUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'False').length;
+                    const UnfinishUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'Unfinish').length;
+                    const memberCount = checkroom.Member.length;
+                    const truePercentage = (trueUserAnswersCount / memberCount) * 100;
+                    const FalsePercentage = (FalseUserAnswersCount / memberCount) * 100;
+                    const UnfinishPercentage = (UnfinishUserAnswersCount / memberCount) * 100;
+
+                    console.log('True 答案的數量：', trueUserAnswersCount);
+                    console.log('False 答案的數量：', FalseUserAnswersCount );
+                    console.log('Unfinish 答案的數量：', UnfinishUserAnswersCount);
+                    console.log('True 的百分比：', truePercentage);
+                    console.log('False 的百分比：', FalsePercentage);
+                    console.log('Unfinish 的百分比：', UnfinishPercentage);
+                    console.log('Room 的 Member 數量：', memberCount);
+                    io.sockets.to(data.RoomCode).emit('percent', truePercentage)
                 });
 
                 socket.on('noqus', function () {

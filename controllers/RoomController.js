@@ -202,17 +202,26 @@ const QSbankData = async (req, res) => {
 
 const userAnswers = async (req, res) => {
     try {
-        const RoomCode = req.body.RoomCode
+        const RoomCode = req.body.RoomCode;
         const room = await Room.findOne({
             RoomCode: RoomCode
         });
-        const userId = req.session.user._id
+        const userId = req.session.user._id;
         if (room) {
-            const userAnswersResults = room.userAnswers.filter(answer => answer.userId === userId);
-            if (userAnswersResults) {
+            const userAnswersResults = [];
+            room.questions.forEach(question => {
+                question.userAnswers.forEach(answer => {
+                    if (answer.userId === userId) {
+                        userAnswersResults.push(answer);
+                    }
+                });
+            });
+            if (userAnswersResults.length > 0) {
                 res.json({
                     userAnswersResults
                 });
+            } else {
+                console.log("未找到用戶回答。");
             }
         } else {
             console.log("未找到符合的房間。");

@@ -5,6 +5,8 @@ const Room = require("../models/room");
 const bcrypt = require("bcrypt");
 const path = require('path');
 const sockets = require('../socket');
+const key = 'ThisIsUser'
+const jwt = require('jsonwebtoken')
 
 // 學生登入處理函式
 const loginstudent = async (req, res) => {
@@ -22,27 +24,39 @@ const loginstudent = async (req, res) => {
                 req.session.user = userData;
                 if (userData.role === 'student') {
                     console.log("學生登入");
-                    await userData.generateAuthToken()
+                    let token = null;
+
+                    if (userData.token) {
+                        token = jwt.sign({
+                            _id: userData._id.toString()
+                        }, key);
+                      
+                        await userData.delAuthToken();
+                    } 
+                    token = jwt.sign({
+                        _id: userData._id.toString()
+                    }, key);
+                    await userData.generateAuthToken(token);
+
+                    res.setHeader("Authorization", 'Bearer ' + token);
                     return res.redirect('/home');
                 } else {
-                    res.redirect('/?message=Email%20NG');
                     console.error('找不到學生使用者或密碼不匹配');
-                    return res.redirect('/');
+                    return res.redirect('/?message=Email%20NG');
                 }
             } else {
-                res.redirect('/?message=Email%20NG');
                 console.error('找不到學生使用者或密碼不匹配');
-                return res.redirect('/');
+                return res.redirect('/?message=Email%20NG');
             }
         } else {
-            res.redirect('/?message=Email%20NG');
             console.error('找不到學生使用者或密碼不匹配');
-            return res.redirect('/');
+            return res.redirect('/?message=Email%20NG');
         }
     } catch (error) {
-        console.log(error.message);
+        console.log('loginstudent', error.message);
+        return res.status(500).send('Internal Server Error');
     }
-}
+};
 
 // 學生註冊處理函式
 const registerstudent = async (req, res) => {
@@ -70,7 +84,6 @@ const registerstudent = async (req, res) => {
                     password: req.body.password,
                     role: role
                 });
-
                 await user.save();
                 res.redirect('/?message=Email%20pass');
 
@@ -100,6 +113,23 @@ const loginteacher = async (req, res) => {
                 req.session.user = userData;
                 if (userData.role === 'teacher') {
                     console.log("教師登入");
+
+                    let token = null;
+
+                    if (userData.token) {
+                        token = jwt.sign({
+                            _id: userData._id.toString()
+                        }, key);
+                      
+                        await userData.delAuthToken();
+                    } 
+                    token = jwt.sign({
+                        _id: userData._id.toString()
+                    }, key);
+                    await userData.generateAuthToken(token);
+
+                    res.setHeader("Authorization", 'Bearer ' + token);
+
                     return res.redirect('/home');
                 } else {
                     res.redirect('/?message=Email%20NG');
@@ -168,6 +198,7 @@ const home = async (req, res) => {
         const role = req.session.user.role;
         const Name = req.session.user.name;
         const HtmlPath = path.join(__dirname, '..', 'public', 'personal.html');
+
         if (req.session.user) {
             if (role === 'student') {
                 const roomQuery = {
@@ -287,7 +318,7 @@ const homeData = async (req, res) => {
                     role: role,
                     Lv: Lv,
                     Name: Name,
-                    img: studentimg.image
+                    img: studentimg.image,
                 };
                 res.json(responseData);
             } else {
@@ -324,17 +355,13 @@ const loadlogin = async (req, res) => {
 const logout = async (req, res) => {
     try {
         req.session.destroy(); // 清除session
-        console.log('tokens', req.user)
-        if (req.user && req.user.tokens) {
-            console.log('tokens', req.user.tokens)
-            req.user.tokens = []
-        }
         res.redirect('/'); // 重定向到首頁
         console.log("登出");
     } catch (error) {
         console.log(error.message);
     }
 }
+
 
 module.exports = {
     loginstudent,

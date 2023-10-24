@@ -175,27 +175,5 @@
     </main>
 </body>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
-    socket.on('connection', function () {
-        console.log('A user connected');
-    })
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get('message');
-
-    if (message === 'Email already') {
-        window.alert("重複註冊");
-        window.location.href = "/";
-    } else if (message === 'Email pass') {
-        window.alert("通過註冊");
-        window.location.href = "/";
-    } else if (message === 'Email NG') {
-        window.alert("登入錯誤");
-        window.location.href = "/";
-    } else if (message === 'password error') {
-        window.alert("密碼不符");
-        window.location.href = "/";
-    } 
-</script>
 
 </html>
