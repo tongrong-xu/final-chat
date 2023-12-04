@@ -131,30 +131,32 @@ $(document).ready(function () {
     };
     CreatNowQusDom(question);
 
-    // 添加選項的點擊事件處理程序
-    options.click(function (event) {
-      var no = $(this).attr("no"); // 獲取選項編號
-      if (no == data[0].answer) {
-        console.log("答對了");
-        changeQueueState(data[0].no, "答對了")
-        socket.emit('qusTrue', {
-          data: data[0],
-          id: useridElement.value,
-          state: 'True'
-        })
-        isAnswerCorrect = true
-      } else {
-        console.log("答錯了");
-        changeQueueState(data[0].no, "答錯了")
-        socket.emit('qusFalse', {
-          data: data[0],
-          id: useridElement.value,
-          state: 'False'
-        })
-        isAnswerCorrect = true
-      }
-      options.off("click");
-    });
+    if (!Isteacher) {
+      // 添加選項的點擊事件處理程序
+      options.click(function (event) {
+        var no = $(this).attr("no"); // 獲取選項編號
+        if (no == data[0].answer) {
+          console.log("答對了");
+          changeQueueState(data[0].no, "答對了")
+          socket.emit('qusTrue', {
+            data: data[0],
+            id: useridElement.value,
+            state: 'True'
+          })
+          isAnswerCorrect = true
+        } else {
+          console.log("答錯了");
+          changeQueueState(data[0].no, "答錯了")
+          socket.emit('qusFalse', {
+            data: data[0],
+            id: useridElement.value,
+            state: 'False'
+          })
+          isAnswerCorrect = true
+        }
+        options.off("click");
+      });
+    }
     if (Isteacher) {
       setTimeout(function () {
         socket.emit('qusState', {
@@ -201,11 +203,11 @@ $(document).ready(function () {
       $(this).addClass("qusbank-choose");
 
       //讀取題庫ID
-      nowQusBankId = parseInt($(this).attr("qusbank-id"));
+      const nowQusBankId = parseInt($(this).attr("qusbank-id"));
 
-      const qusBankname = parseInt($(this).find('.qus-bank-name').text())
+      const qusBankname = $(this).find('.qus-bank-name').text()
 
-      console.log('qusBankname', qusBankname)
+      console.log('qusBankname', qusBankname, nowQusBankId)
 
       if (qusBankname) {
         let sendData = {
@@ -319,7 +321,7 @@ $(document).ready(function () {
     let qusBankDom = `
   <!-- 題庫 -->
   <div class="col row align-items-center qus-bank" qusbank-id="${qusBankObj["id"]}">
-      <div class="col-12 line-clamp-1 qus-bank-name">${qusBankObj["name"]}</div>
+      <div class="col-12 line-clamp-1 qus-bank-name" value="${qusBankObj["name"]}">${qusBankObj["name"]}</div>
   </div>
   <hr style="margin: 0;">
   `;
@@ -506,7 +508,7 @@ $(document).ready(function () {
           console.log('percent', data)
         });
       }
-      
+
     });
   });
   //送出已選取的問題

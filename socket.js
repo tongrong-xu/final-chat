@@ -170,7 +170,7 @@ const socketOn = function (io) {
                     });
                     const QUE = checkroom.questions[checkroom.questions.length - 1];
                     QUE.userAnswers.push({
-                        userId:dataTrue.id,
+                        userId: dataTrue.id,
                         questionText: dataTrue.data.qus,
                         state: dataTrue.state
                     });
@@ -221,9 +221,9 @@ const socketOn = function (io) {
 
                     // 更新每個問題的答題狀況
                     QUE.userAnswers.forEach(answer => {
-                        answer.Truepercent = userAnswersCount[answer.userId].True ;
-                        answer.Falsepercent = userAnswersCount[answer.userId].False ;
-                        answer.Unfinishpercent = userAnswersCount[answer.userId].Unfinish ;
+                        answer.Truepercent = userAnswersCount[answer.userId].True;
+                        answer.Falsepercent = userAnswersCount[answer.userId].False;
+                        answer.Unfinishpercent = userAnswersCount[answer.userId].Unfinish;
                     });
 
                     await checkroom.save();
@@ -231,18 +231,18 @@ const socketOn = function (io) {
                     const trueUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'True').length;
                     const FalseUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'False').length;
                     const UnfinishUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'Unfinish').length;
-                    const memberCount = checkroom.Member.length;
+                    const memberCount = checkroom.Member.length - 1;
                     const truePercentage = (trueUserAnswersCount / memberCount) * 100;
                     const FalsePercentage = (FalseUserAnswersCount / memberCount) * 100;
                     const UnfinishPercentage = (UnfinishUserAnswersCount / memberCount) * 100;
 
                     console.log('True 答案的數量：', trueUserAnswersCount);
-                    console.log('False 答案的數量：', FalseUserAnswersCount );
+                    console.log('False 答案的數量：', FalseUserAnswersCount);
                     console.log('Unfinish 答案的數量：', UnfinishUserAnswersCount);
                     console.log('True 的百分比：', truePercentage);
                     console.log('False 的百分比：', FalsePercentage);
                     console.log('Unfinish 的百分比：', UnfinishPercentage);
-                    console.log('Room 的 Member 數量：', memberCount);
+                    console.log('計算 Room 的 答題者數量：', memberCount);
                     io.sockets.to(data.RoomCode).emit('percent', truePercentage)
                 });
 
