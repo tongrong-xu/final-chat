@@ -199,7 +199,7 @@ const socketOn = function (io) {
                     const question = dataState.data.qus;
                     const state = dataState.state;
                     checkroom.Member.forEach(member => {
-                        const existingUserAnswer = QUE.userAnswers.find(answer => answer.userId === member && answer.questionText === question);
+                        const existingUserAnswer = QUE.userAnswers.find(answer => answer.userId === member && answer.questionText === question && answer.userId !== dataState.id);
                         if (!existingUserAnswer) {
                             QUE.userAnswers.push({
                                 userId: member,
@@ -226,15 +226,27 @@ const socketOn = function (io) {
                         answer.Unfinishpercent = userAnswersCount[answer.userId].Unfinish;
                     });
 
-                    await checkroom.save();
-
                     const trueUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'True').length;
                     const FalseUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'False').length;
-                    const UnfinishUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'Unfinish').length;
+                    const UnfinishUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'Unfinish').length - 1;
                     const memberCount = checkroom.Member.length - 1;
                     const truePercentage = (trueUserAnswersCount / memberCount) * 100;
                     const FalsePercentage = (FalseUserAnswersCount / memberCount) * 100;
                     const UnfinishPercentage = (UnfinishUserAnswersCount / memberCount) * 100;
+
+                    QUE.answerCounts = {
+                        trueCount: trueUserAnswersCount,
+                        falseCount: FalseUserAnswersCount,
+                        unfinishCount: UnfinishUserAnswersCount,
+                    };
+
+                    QUE.answerPercentages = {
+                        truePercentage: truePercentage,
+                        falsePercentage: FalsePercentage,
+                        unfinishPercentage: UnfinishPercentage,
+                    };
+
+                    await checkroom.save();
 
                     console.log('True 答案的數量：', trueUserAnswersCount);
                     console.log('False 答案的數量：', FalseUserAnswersCount);
@@ -243,8 +255,13 @@ const socketOn = function (io) {
                     console.log('False 的百分比：', FalsePercentage);
                     console.log('Unfinish 的百分比：', UnfinishPercentage);
                     console.log('計算 Room 的 答題者數量：', memberCount);
-                    io.sockets.to(data.RoomCode).emit('percent', truePercentage)
-                });
+
+
+                    io.sockets.to(data.RoomCode).emit('percent', {
+                        truePercentage,
+                        question
+                    })
+                })
 
                 socket.on('noqus', function () {
                     console.log("noqus");

@@ -15,9 +15,6 @@ $(document).ready(function () {
         });
         Isteacher = true
       }
-    },
-    error: function () {
-
     }
   });
 
@@ -363,31 +360,53 @@ $(document).ready(function () {
   socket.emit('QusRoomCode', {
     RoomCode: RoomCode
   })
+  if (!Isteacher) {
+    $.ajax({
+      url: '/home/rooms/userAnswers',
+      type: 'POST',
+      data: JSON.stringify({
+        RoomCode: RoomCode
+      }),
+      contentType: 'application/json',
+      success: function (response) {
+        const stateMapping = {
+          True: '答對了',
+          False: '答錯了',
+          Unfinish: '未完成'
+        };
 
+        response.userAnswersResults.forEach((qusItem) => {
+          topicQuantity++;
+          CreatNowQusDom({
+            index: topicQuantity,
+            name: qusItem.questionText,
+            reslut: stateMapping[qusItem.state] || qusItem.state
+          });
+        })
+
+      },
+      error: function (error) {
+        console.error('錯：', error);
+      }
+    });
+  }
   $.ajax({
-    url: '/home/rooms/userAnswers',
+    url: '/home/rooms/RoomAnswers',
     type: 'POST',
     data: JSON.stringify({
       RoomCode: RoomCode
     }),
     contentType: 'application/json',
     success: function (response) {
-      const stateMapping = {
-        True: '答對了',
-        False: '答錯了',
-        Unfinish: '未完成'
-      };
+      console.log(response)
       response.userAnswersResults.forEach((qusItem) => {
         topicQuantity++;
         CreatNowQusDom({
           index: topicQuantity,
           name: qusItem.questionText,
-          reslut: stateMapping[qusItem.state] || qusItem.state
+          reslut: "正確率" + qusItem.answerPercentages + "%"
         });
       });
-    },
-    error: function (error) {
-      console.error('錯：', error);
     }
   });
 
@@ -505,6 +524,7 @@ $(document).ready(function () {
       if (Isteacher) {
         socket.off('percent'); // 移除之前的監聽器
         socket.on('percent', function (data) {
+          changeQueueState(topicQuantity, "正確率" + data.truePercentage + "%")
           console.log('percent', data)
         });
       }

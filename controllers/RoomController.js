@@ -207,7 +207,8 @@ const userAnswers = async (req, res) => {
             RoomCode: RoomCode
         });
         const userId = req.session.user._id;
-        if (room) {
+        const userrole = req.session.user.role;
+        if (room && userrole == "student") {
             const userAnswersResults = [];
             room.questions.forEach(question => {
                 question.userAnswers.forEach(answer => {
@@ -225,6 +226,49 @@ const userAnswers = async (req, res) => {
             }
         } else {
             console.log("未找到符合的房間。");
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.redirect(`/home`);
+    }
+}
+
+const RoomAnswers = async (req, res) => {
+    try {
+        const RoomCode = req.body.RoomCode;
+        const Isteacher = req.session.user.role;
+        if (Isteacher == "teacher") {
+            const userAnswersResults = await Room.aggregate([{
+                    $match: {
+                        RoomCode: RoomCode
+                    }
+                },
+                {
+                    $unwind: '$questions'
+                },
+                {
+                    $unwind: '$questions.questionBankText'
+                },
+                {
+                    $unwind: '$questions.questionText'
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        questionBankText: '$questions.questionBankText',
+                        questionText: '$questions.questionText',
+                        answerPercentages: '$questions.answerPercentages.truePercentage',
+                    }
+                }
+            ]);
+
+            if (userAnswersResults.length > 0) {
+                res.json({
+                    userAnswersResults
+                });
+            } else {
+                console.log("未找到用戶回答。");
+            }
         }
     } catch (error) {
         console.log(error.message);
@@ -646,6 +690,7 @@ module.exports = {
     topic,
     QSbankData,
     userAnswers,
+    RoomAnswers,
     QSbankDel,
     QuestionBankName,
     BankNameUpdata,

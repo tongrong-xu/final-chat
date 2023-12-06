@@ -20,6 +20,8 @@ Room.post('/GoChat', auth.requireLogin, RoomController.GoChat);
 
 Room.post('/userAnswers', auth.requireLogin, RoomController.userAnswers);
 
+Room.post('/RoomAnswers', auth.requireLogin, RoomController.RoomAnswers);
+
 Room.get('/topic', auth.requireLogin, auth.isteacher, RoomController.topic);
 
 Room.get('/QSbankData', auth.requireLogin, auth.isteacher, RoomController.QSbankData);

@@ -21,14 +21,27 @@ const QuestionSchema = new mongoose.Schema({
     },
     correctOption: Number,
     userAnswers: [UserAnswerSchema],
-    Truepercent: {
-        type: String,
+    answerCounts: {
+        trueCount: {
+            type: Number,
+        },
+        falseCount: {
+            type: Number,
+        },
+        unfinishCount: {
+            type: Number,
+        },
     },
-    Falsepercent: {
-        type: String,
-    },
-    Unfinishpercent: {
-        type: String,
+    answerPercentages: {
+        truePercentage: {
+            type: Number,
+        },
+        falsePercentage: {
+            type: Number,
+        },
+        unfinishPercentage: {
+            type: Number,
+        },
     },
 
 });

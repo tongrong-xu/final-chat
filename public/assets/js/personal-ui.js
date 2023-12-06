@@ -120,7 +120,7 @@ $(document).ready(function () {
 
         // 此處插入後端資料
 
-        CreatRoomDom();//創建dom，需要傳入房間資訊
+        CreatRoomDom(); //創建dom，需要傳入房間資訊
     });
 
     function CreatRoomDom(roomInfor = {
@@ -141,15 +141,13 @@ $(document).ready(function () {
             <div class="col-2 room-status">${roomInfor["status"]}</div>
             <div class="col-3 room-qus-type">${roomInfor["qusType"]}</div>
             <div class="col-2 room-people">12/30</div>
-            
         </div>
-        <hr style="margin: 0;">
         `;
 
 
         canJoinRoomCon.append(roomHtml);
     }
-    
+
     document.getElementById("input-room-id").addEventListener("keydown", function (e) {
         if (e.key === "Enter" && this.value.trim() === "") {
             e.preventDefault(); // 阻止提交表單
@@ -159,7 +157,7 @@ $(document).ready(function () {
 
     document.getElementById("join").addEventListener("submit", function (e) {
         const roomInput = document.getElementById("input-room-id");
-        
+
         // 檢查如果 roomInput 為空或僅包含空格，阻止表單提交
         if (roomInput.value.trim() === "") {
             e.preventDefault(); // 阻止提交表單
@@ -168,7 +166,7 @@ $(document).ready(function () {
     });
 
     //----------------------判斷權限--------------------
-    var accountPermissions = "teacher";//帳號權限
+    var accountPermissions = "teacher"; //帳號權限
     // var accountPermissions = "student";
 
     if (accountPermissions == "student") {
@@ -221,8 +219,7 @@ $(document).ready(function () {
         if (permission == "teacehr") {
             permissionTitle.text("老師");
             manageQusBankBtn.show();
-        }
-        else if (permission == "student") {
+        } else if (permission == "student") {
             permissionTitle.text("學生");
             manageQusBankBtn.hide();
         }
@@ -278,7 +275,6 @@ $(document).ready(function () {
             <div class="col-2 room-qus-type">${newpublic.MasterName}</div>
             <div class="col-2 room-people">${formatDate(newpublic.createdAt)}</div>
         </div>
-        <hr style="margin: 0;">
         `;
 
         // 將 hrElement 附加到 roomElement 內部
@@ -286,7 +282,9 @@ $(document).ready(function () {
         roomElement.addEventListener('click', async () => {
             try {
                 const roomCode = roomElement.querySelector('.room-id').getAttribute('room-id');
-                const requestData = { roomCode: roomCode };
+                const requestData = {
+                    roomCode: roomCode
+                };
                 const requestBody = JSON.stringify(requestData);
 
                 const response = await fetch('home/rooms/GoChat', {
@@ -335,7 +333,6 @@ $(document).ready(function () {
                 <div class="col-2 room-qus-type">${room.teacehr}</div>
                 <div class="col-2 room-people">${formatDate(room.LastUpdatedAt)}</div>
             </div>
-            <hr style="margin: 0;">
             `;
             roomInfoElement.appendChild(roomElement);
 
@@ -344,7 +341,9 @@ $(document).ready(function () {
             roomElement.addEventListener('click', async () => {
                 try {
                     const roomCode = roomElement.querySelector('.room-id').getAttribute('room-id');
-                    const requestData = { roomCode: roomCode };
+                    const requestData = {
+                        roomCode: roomCode
+                    };
                     const requestBody = JSON.stringify(requestData);
 
                     const response = await fetch('home/rooms/GoChat', {
