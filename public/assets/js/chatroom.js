@@ -6,11 +6,9 @@ $(document).ready(function () {
     const right = $(".right");
     //--------------------socket--------------------
 
-    const socket = io();
-    const connect = 'connect';
+    const socket = io('/');
     let needchat = 10;
     let isScrolling = false;
-    //let roommyname = ''
     const usernameElement = document.getElementById('username');
     usernameElement.textContent = ''
     const userLvElement = document.getElementById('userLv');
@@ -22,6 +20,101 @@ $(document).ready(function () {
     const roomCode = fullUrl.split('/').pop();
     const RoomCode = roomCode.replace('Room_', '');
     memberListContainer.innerHTML = '';
+
+    //---Video
+    const videoGrid = document.getElementById('camera-con');
+    const cameraBtn = document.querySelector('#cameraopen')
+    const screenBtn = document.querySelector('#screen')
+    const closeBtn = document.querySelector('#close')
+
+    const myPeer = new Peer(undefined, {
+        host: '/',
+        port: '3000'
+    })
+    const myVideo = document.createElement('video')
+    myVideo.muted = true
+    const peers = {}
+
+    // stream 檔案
+    let cameraStream;
+    let screenStream;
+    let stream;
+
+    let OpenVideo = false;
+
+    // mediaDevices 的設定
+    const constraints = {
+        audio: true,
+        video: true
+    }
+    myPeer.on('open', id => {
+        console.log('forpeer', id)
+
+        cameraBtn.addEventListener('click', () => {
+            if (cameraStream) return;
+            // 取得視訊鏡頭的 stream
+            navigator.mediaDevices.getUserMedia(constraints).then(cStream => {
+                cameraStream = cStream;
+                stream = cameraStream;
+                OpenVideo = true;
+                // 將本來螢幕分享的 stream清除
+                addVideoStream(cameraStream, myVideo, cameraStream);
+                myPeer.on('call', call => {
+                    call.answer(cameraStream);
+                    const video = document.createElement('video');
+                    video.className = 'camera';
+                    video.id = 'ordercamera';
+                    call.on('stream', userVideoStream => {
+                        addVideoStream(video, userVideoStream);
+                    });
+                });
+            });
+        });
+
+        screenBtn.addEventListener('click', () => {
+            if (screenStream) return;
+            // 取得螢幕分享 stream
+            navigator.mediaDevices.getDisplayMedia(constraints).then(sStream => {
+                screenStream = sStream;
+                stream = screenStream;
+                OpenVideo = true;
+                addVideoStream(screenStream, myVideo, screenStream);
+                myPeer.on('call', call => {
+                    call.answer(screenStream);
+                    const video = document.createElement('video');
+                    video.className = 'camera';
+                    video.id = 'ordercamera';
+                    call.on('stream', userVideoStream => {
+                        addVideoStream(video, userVideoStream);
+                    });
+                });
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            if (screenStream) {
+                // 將螢幕分享的 stream 清除
+                screenStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                screenStream = null;
+            }
+            if (cameraStream) {
+                // 將視訊鏡頭的 stream 清除
+                cameraStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                cameraStream = null;
+            }
+            OpenVideo = false
+        });
+    })
+    if (OpenVideo == true)
+        console.log('peerID', id)
+    else
+        console.log('peerIDNot Open')
+
+
 
     $.ajax({
         url: '/home/rooms/classroomData', // 請將路由設置為返回用戶資料的路由
@@ -159,143 +252,155 @@ $(document).ready(function () {
             }
 
             //---socket
-            socket.on('connect', function () {
-                console.log(RoomCode)
 
-                socket.emit('RoomCode', {
-                    RoomCode: RoomCode,
-                    myName: data.Name
-                })
+            console.log(RoomCode)
 
-                socket.on('enter', (data) => {
-                    const text = data + ' is join'
-                    createBarrage(text, "black", 0);
-                })
+            socket.emit('RoomCode', {
+                RoomCode: RoomCode,
+                myName: data.Name
+            })
 
-                socket.on('overtime', () => {
-                    const text = '房間已過期，無法發送新消息'
-                    createBarrage(text, "black", 0);
-                })
+            socket.on('enter', (data) => {
+                const text = data + ' is join'
+                createBarrage(text, "black", 0);
+            })
 
-                socket.on('out', (data) => {
-                    const text = data + ' is leave'
-                    createBarrage(text, "black", 0);
-                })
+            socket.on('overtime', () => {
+                const text = '房間已過期，無法發送新消息'
+                createBarrage(text, "black", 0);
+            })
 
-                //發送訊息
-                socket.on('receive', function (Obj) {
-                    createBarrage(Obj.message, Obj.color, Obj.type);
-                    var messageDiv = $('<div class="col-12 message"></div>').text(Obj.message);
-                    var messageDivString = messageDiv.html();
-                    if (data.Name == Obj.username) {
-                        var $msg = `
+            socket.on('out', (data) => {
+                const text = data + ' is leave'
+                createBarrage(text, "black", 0);
+            })
+
+            //---Video
+            /*socket.on('user-connected', userId => {
+                console.log('connected', userId)
+                connectToNewUser(userId, stream)
+            })
+
+
+            socket.on('user-disconnected', userId => {
+                if (peers[userId]) peers[userId].close()
+            })*/
+            //---Video
+
+            //發送訊息
+            socket.on('receive', function (Obj) {
+                createBarrage(Obj.message, Obj.color, Obj.type);
+                var messageDiv = $('<div class="col-12 message"></div>').text(Obj.message);
+                var messageDivString = messageDiv.html();
+                if (data.Name == Obj.username) {
+                    var $msg = `
                     <div class="col row message-username-self-con" id="message-con">
                     <div class="col-3 message-username-self">${Obj.username}</div>
                     <div class="col-9 message-time">${Obj.time}</div>
                     ${messageDivString}
                     </div>
                     <hr>`;
-                    } else {
-                        var $msg = `
+                } else {
+                    var $msg = `
                         <div class="col row " >
                         <div class="col-3 message-username">${Obj.username}</div>
                         <div class="col-9 message-time">${Obj.time}</div>
                         ${messageDivString}
                         </div>
                         <hr>`;
+                }
+                chatroomCon.append($msg);
+                scrollMessage()
+            })
+            socket.on('History', function (History) {
+                // 清空聊天視窗
+                chatroomCon.html('');
+
+                // 遍歷資料並印出每個訊息
+                History.forEach(messageData => {
+                    const messageDiv = $('<div class="col-12 message"></div>').text(messageData.content);
+                    const messageDivString = messageDiv.html();
+                    let $msg = '';
+
+                    if (data.Name == messageData.username) {
+                        // 自己的訊息
+                        $msg = `
+                                <div class="col row message-username-self-con" id="message-con">
+                                    <div class="col-3 message-username-self">${messageData.username}</div>
+                                    <div class="col-9 message-time">${messageData.time}</div>
+                                    ${messageDivString}
+                                </div>
+                                <hr>`;
+                    } else {
+                        // 其他人的訊息
+                        $msg = `
+                                <div class="col row " >
+                                    <div class="col-3 message-username">${messageData.username}</div>
+                                    <div class="col-9 message-time">${messageData.time}</div>
+                                    ${messageDivString}
+                                </div>
+                                <hr>`;
                     }
                     chatroomCon.append($msg);
-                    scrollMessage()
-                })
-                socket.on('History', function (History) {
-                    // 清空聊天視窗
-                    chatroomCon.html('');
 
-                    // 遍歷資料並印出每個訊息
-                    History.forEach(messageData => {
-                        const messageDiv = $('<div class="col-12 message"></div>').text(messageData.content);
-                        const messageDivString = messageDiv.html();
-                        let $msg = '';
+                    chatroomCon.scroll(function () {
+                        if (!isScrolling && $(this).scrollTop() === 0) {
+                            // 如果已經滾動到頂部，則向伺服器請求更多訊息
+                            isScrolling = true;
+                            needchat = needchat + 10
+                            need()
+                        }
 
-                        if (data.Name == messageData.username) {
-                            // 自己的訊息
-                            $msg = `
+                        function need() {
+                            socket.emit('needMoreChat', needchat);
+
+                        }
+                        setTimeout(function () {
+                            isScrolling = false;
+                        }, 1000);
+                    });
+
+                });
+                scrollMessage()
+            });
+            socket.on('TenMoreChat', function (TMC) {
+                // 遍歷資料並印出每個訊息
+                TMC.forEach(messageData => {
+                    const messageDiv = $('<div class="col-12 message"></div>').text(messageData.content);
+                    const messageDivString = messageDiv.html();
+                    let $msg = '';
+
+                    if (data.Name == messageData.username) {
+                        // 自己的訊息
+                        $msg = `
                                 <div class="col row message-username-self-con" id="message-con">
                                     <div class="col-3 message-username-self">${messageData.username}</div>
                                     <div class="col-9 message-time">${messageData.time}</div>
                                     ${messageDivString}
                                 </div>
                                 <hr>`;
-                        } else {
-                            // 其他人的訊息
-                            $msg = `
+                    } else {
+                        // 其他人的訊息
+                        $msg = `
                                 <div class="col row " >
                                     <div class="col-3 message-username">${messageData.username}</div>
                                     <div class="col-9 message-time">${messageData.time}</div>
                                     ${messageDivString}
                                 </div>
                                 <hr>`;
-                        }
-                        chatroomCon.append($msg);
-
-                        chatroomCon.scroll(function () {
-                            if (!isScrolling && $(this).scrollTop() === 0) {
-                                // 如果已經滾動到頂部，則向伺服器請求更多訊息
-                                isScrolling = true;
-                                needchat = needchat + 10
-                                need()
-                            }
-
-                            function need() {
-                                socket.emit('needMoreChat', needchat);
-
-                            }
-                            setTimeout(function () {
-                                isScrolling = false;
-                            }, 1000);
-                        });
-
-                    });
-                    scrollMessage()
+                    }
+                    chatroomCon.prepend($msg);
                 });
-                socket.on('TenMoreChat', function (TMC) {
-                    // 遍歷資料並印出每個訊息
-                    TMC.forEach(messageData => {
-                        const messageDiv = $('<div class="col-12 message"></div>').text(messageData.content);
-                        const messageDivString = messageDiv.html();
-                        let $msg = '';
-
-                        if (data.Name == messageData.username) {
-                            // 自己的訊息
-                            $msg = `
-                                <div class="col row message-username-self-con" id="message-con">
-                                    <div class="col-3 message-username-self">${messageData.username}</div>
-                                    <div class="col-9 message-time">${messageData.time}</div>
-                                    ${messageDivString}
-                                </div>
-                                <hr>`;
-                        } else {
-                            // 其他人的訊息
-                            $msg = `
-                                <div class="col row " >
-                                    <div class="col-3 message-username">${messageData.username}</div>
-                                    <div class="col-9 message-time">${messageData.time}</div>
-                                    ${messageDivString}
-                                </div>
-                                <hr>`;
-                        }
-                        chatroomCon.prepend($msg);
-                    });
-                    chatroomCon.scrollTop(43.5 * TMC.length)
-                });
-                socket.on('RoomMemberOnline', (RMonline) => {
-                    memberListContainer.innerHTML = '<p>線上</p>'
-                    if (RMonline) {
-                        RMonline.forEach(member => {
-                            const memberDiv = document.createElement('div');
-                            if (data.Name == member.name) {
-                                memberDiv.className = 'col row member-username-self-con';
-                                memberDiv.innerHTML = `
+                chatroomCon.scrollTop(43.5 * TMC.length)
+            });
+            socket.on('RoomMemberOnline', (RMonline) => {
+                memberListContainer.innerHTML = '<p>線上</p>'
+                if (RMonline) {
+                    RMonline.forEach(member => {
+                        const memberDiv = document.createElement('div');
+                        if (data.Name == member.name) {
+                            memberDiv.className = 'col row member-username-self-con';
+                            memberDiv.innerHTML = `
                                 <div class="col-3" id="header" style="background-color: green;">
                                 <img src="#" alt="">
                             </div>
@@ -303,10 +408,10 @@ $(document).ready(function () {
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
                             `;
-                                memberListContainer.appendChild(memberDiv);
-                            } else {
-                                memberDiv.className = 'col row';
-                                memberDiv.innerHTML = `
+                            memberListContainer.appendChild(memberDiv);
+                        } else {
+                            memberDiv.className = 'col row';
+                            memberDiv.innerHTML = `
                                 <div class="col-3" id="header" style="background-color: green;">
                                     <img src="#" alt="">
                                 </div>
@@ -314,24 +419,24 @@ $(document).ready(function () {
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
                             `;
-                                memberListContainer.appendChild(memberDiv);
-                            }
-                        });
-                    } else {
-                        console.log("unknown");
-                    }
-                });
+                            memberListContainer.appendChild(memberDiv);
+                        }
+                    });
+                } else {
+                    console.log("unknown");
+                }
+            });
 
-                socket.on('RoomMemberOffline', (RMOffline) => {
-                    const Offline = document.createElement('div');
-                    Offline.innerHTML = `<p>離線</p>`;
-                    memberListContainer.appendChild(Offline)
-                    if (RMOffline) {
-                        RMOffline.forEach(member => {
-                            const memberDiv = document.createElement('div');
-                            if (data.Name == member.name) {
-                                memberDiv.className = 'col row member-username-self-con';
-                                memberDiv.innerHTML = `
+            socket.on('RoomMemberOffline', (RMOffline) => {
+                const Offline = document.createElement('div');
+                Offline.innerHTML = `<p>離線</p>`;
+                memberListContainer.appendChild(Offline)
+                if (RMOffline) {
+                    RMOffline.forEach(member => {
+                        const memberDiv = document.createElement('div');
+                        if (data.Name == member.name) {
+                            memberDiv.className = 'col row member-username-self-con';
+                            memberDiv.innerHTML = `
                                 <div class="col-3" id="header" style="background-color: green;">
                                 <img src="#" alt="" >
                                 </div>
@@ -339,10 +444,10 @@ $(document).ready(function () {
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
                             `;
-                                memberListContainer.appendChild(memberDiv);
-                            } else {
-                                memberDiv.className = 'col row';
-                                memberDiv.innerHTML = `
+                            memberListContainer.appendChild(memberDiv);
+                        } else {
+                            memberDiv.className = 'col row';
+                            memberDiv.innerHTML = `
                                 <div class="col-3" id="header">
                                     <img src="#" alt="">
                                 </div>
@@ -350,18 +455,16 @@ $(document).ready(function () {
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
                             `;
-                                memberListContainer.appendChild(memberDiv);
-                            }
-                        });
-                    } else {
-                        console.log("unknown");
-                    }
-                });
-                socket.on('disconnect', function () {
-                    window.location.href = `/home`;
-                });
-
-            })
+                            memberListContainer.appendChild(memberDiv);
+                        }
+                    });
+                } else {
+                    console.log("unknown");
+                }
+            });
+            socket.on('disconnect', function () {
+                window.location.href = `/home`;
+            });
 
         },
         error: function (error) {
@@ -426,7 +529,59 @@ $(document).ready(function () {
         window.location.href = `/home`;
     })
 
+
     function scrollMessage() {
         chatroomCon.scrollTop(chatroomCon[0].scrollHeight);
     }
+    //---Video
+
+    function connectToNewUser(userId, stream) {
+        const call = myPeer.call(userId, stream)
+        const video = document.createElement('video')
+        video.className = 'camera';
+        video.id = 'camera';
+        call.on('stream', userVideoStream => {
+            addVideoStream(video, userVideoStream)
+        })
+        call.on('close', () => {
+            video.remove()
+        })
+
+        peers[userId] = call
+    }
+
+    function addVideoStream(streamtype, video, stream) {
+        if (streamtype && streamtype === screenStream) {
+            // 將本來視訊鏡頭的 stream 清除
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => {
+                    track.stop()
+                })
+                cameraStream = null
+            }
+            screenStream = stream;
+        } else if (streamtype && streamtype === cameraStream) {
+            // 將本來螢幕分享的 stream 清除
+            if (screenStream) {
+                screenStream.getTracks().forEach(track => {
+                    track.stop()
+                })
+                screenStream = null
+            }
+            cameraStream = stream;
+        }
+
+        video.srcObject = stream;
+        video.addEventListener('loadedmetadata', () => {
+            video.play();
+        });
+
+        if (videoGrid) {
+            videoGrid.append(video);
+        } else {
+            console.error('videoGrid is not found');
+        }
+    }
+
+    //---Video
 });

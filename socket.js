@@ -26,9 +26,10 @@ function Qsname(qsb) {
 const Online = []
 const Member = []
 const Offline = []
-const socketOn = function (io) {
+let ViewCode;
+let websocketList = [];
+const socketOn = function (io, app) {
     io.on('connection', (socket) => {
-
         // 發送用戶相關資訊到客戶端
         socket.emit('viewcode', RoomViewCode);
         socket.emit('qsname', qsname);
@@ -47,6 +48,15 @@ const socketOn = function (io) {
                     }
                     //new Date() <= checkroom.expirationDate 可以聊天
                     if (new Date() <= checkroom.expirationDate) {
+                        //---Video
+                        socket.on('peer', id => {
+                            console.log('peer', id)
+                           /* io.to(data.RoomCode).broadcast.emit('user-connected', id);
+                            socket.on('disconnect', () => {
+                                io.to(data.RoomCode).broadcast.emit('user-disconnected', id)
+                            })*/
+                        })
+                        //---Video
                         //發送訊息
                         socket.on('message', async function (MessageData) {
                             if (data.myName == MessageData.username) {
@@ -269,7 +279,9 @@ const socketOn = function (io) {
             }
         });
     });
+
 };
+
 
 // 匯出模組
 module.exports = {

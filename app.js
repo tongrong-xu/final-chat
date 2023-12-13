@@ -25,7 +25,7 @@ const server = http.createServer(app);
 const io = socketIOServer(server);
 app.set('socketio', io);
 app.use(session({
-  secret: 'cai39kf299fk03k0f29',
+  secret: 'c5h6a7t1r2o3o4m',
   resave: false,
   saveUninitialized: true,
   cookie: {
