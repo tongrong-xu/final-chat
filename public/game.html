@@ -42,6 +42,7 @@
 <body>
     <div id="make-qus-bg" style="display: none;"></div>
     <div id="myid" value=""></div>
+    <div id="user-role" style="display: none;"></div>
     <!-- ----------------------------上方資訊條---------------------------- -->
     <div class="up-var">
         <div class="row align-items-center">
@@ -70,8 +71,13 @@
                         <button class="nav-link" id="nowQus-tab" data-bs-toggle="tab" data-bs-target="#nowQus"
                             type="button" role="tab" aria-controls="nowQus" aria-selected="false">目前出題</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="team-chatroom-tab" data-bs-toggle="tab"
+                            data-bs-target="#team-chatroom" type="button" role="tab" aria-controls="team-chatroom"
+                            aria-selected="true">房間成員</button>
+                    </li>
                 </ul>
-                <!-- ----------------------------聊天室---------------------------- -->
+                <!-- ----------------------------題庫---------------------------- -->
                 <div class="tab-content" id="qustion-Tab-Content" style="overflow-y:auto">
                     <div class="tab-pane fade show active row" id="qustion" role="tabpanel"
                         aria-labelledby="qustion-tab">
@@ -143,6 +149,10 @@
                     <button class="nav-link" id="member-tab" data-bs-toggle="tab" data-bs-target="#member" type="button"
                         role="tab" aria-controls="member" aria-selected="false">成員</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="team-chatroom-tab" data-bs-toggle="tab" data-bs-target="#team-chatroom"
+                        type="button" role="tab" aria-controls="team-chatroom" aria-selected="true">組員聊天</button>
+                </li>
             </ul>
 
             <!-- ----------------------------聊天室---------------------------- -->
@@ -164,9 +174,19 @@
                         </div>
                     </div>
                 </div>
+                <!-- ----------------------------組員聊天室---------------------------- -->
+                <div class="tab-pane fade show row" id="team-chatroom" role="tabpanel" aria-labelledby="chatroom-tab">
+                    <div class="" style="height: calc(100% - 10px);">
+                        <div class="flex-column" id="chatroom-con" style="height: auto;">
+                            <div id="teamchat"></div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
+
     <!-- ----------------------------答題---------------------------- -->
     <div class="qus-con" style="display: flex;flex-direction: column;">
         <div class="qus" no="">
@@ -220,7 +240,7 @@
         <button id="screen">分享螢幕</button>
         <button id="close">關閉分享</button>
         <div class="camera-con" id="camera-con">
-            
+
         </div>
     </div>
 

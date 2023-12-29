@@ -94,3 +94,31 @@
     font-size: 24px;
     text-align: right;
 }
+.options-correct{
+    background-color:  rgb(48, 112, 57);
+    border: 10px solid rgb(47, 255, 82);
+    height: 50px;
+    border-radius: 50px;
+    margin-right: 20px;
+    font-size: 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.options-incorrect{
+    background-color:  rgb(112, 48, 48);
+    border: 10px solid rgb(255, 47, 47);
+    height: 50px;
+    border-radius: 50px;
+    margin-right: 20px;
+    font-size: 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.options-checked{
+    filter: brightness(0.95);
+    border: 10px solid rgb(255, 153, 0)
+}

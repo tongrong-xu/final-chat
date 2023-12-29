@@ -51,10 +51,10 @@ const socketOn = function (io, app) {
                         //---Video
                         socket.on('peer', id => {
                             console.log('peer', id)
-                           /* io.to(data.RoomCode).broadcast.emit('user-connected', id);
-                            socket.on('disconnect', () => {
-                                io.to(data.RoomCode).broadcast.emit('user-disconnected', id)
-                            })*/
+                            /* io.to(data.RoomCode).broadcast.emit('user-connected', id);
+                             socket.on('disconnect', () => {
+                                 io.to(data.RoomCode).broadcast.emit('user-disconnected', id)
+                             })*/
                         })
                         //---Video
                         //發送訊息
@@ -173,6 +173,7 @@ const socketOn = function (io, app) {
                     })
                     await checkroom.save()
                 });
+              
                 socket.on('qusTrue', async function (dataTrue) {
                     console.log("True");
                     const checkroom = await Room.findOne({
@@ -208,8 +209,17 @@ const socketOn = function (io, app) {
                     const QUE = checkroom.questions[checkroom.questions.length - 1];
                     const question = dataState.data.qus;
                     const state = dataState.state;
-                    checkroom.Member.forEach(member => {
-                        const existingUserAnswer = QUE.userAnswers.find(answer => answer.userId === member && answer.questionText === question && answer.userId !== dataState.id);
+                    const questionCreatorId = dataState.id; // 出題者的 ID
+
+                    // 排除出題者
+                    const filteredMembers = checkroom.Member.filter(member => member !== questionCreatorId);
+
+                    // 遍歷成員並將答案添加到問題中
+                    filteredMembers.forEach(member => {
+                        const existingUserAnswer = QUE.userAnswers.find(answer =>
+                            answer.userId === member &&
+                            answer.questionText === question
+                        );
                         if (!existingUserAnswer) {
                             QUE.userAnswers.push({
                                 userId: member,
@@ -221,7 +231,7 @@ const socketOn = function (io, app) {
 
                     // 計算答題狀況的百分比
                     const userAnswersCount = {};
-                    checkroom.Member.forEach(member => {
+                    filteredMembers.forEach(member => {
                         userAnswersCount[member] = {
                             True: QUE.userAnswers.filter(answer => answer.userId === member && answer.state === 'True').length,
                             False: QUE.userAnswers.filter(answer => answer.userId === member && answer.state === 'False').length,
@@ -231,47 +241,53 @@ const socketOn = function (io, app) {
 
                     // 更新每個問題的答題狀況
                     QUE.userAnswers.forEach(answer => {
-                        answer.Truepercent = userAnswersCount[answer.userId].True;
-                        answer.Falsepercent = userAnswersCount[answer.userId].False;
-                        answer.Unfinishpercent = userAnswersCount[answer.userId].Unfinish;
+                        if (userAnswersCount[answer.userId]) {
+                            answer.Truepercent = userAnswersCount[answer.userId].True;
+                            answer.Falsepercent = userAnswersCount[answer.userId].False;
+                            answer.Unfinishpercent = userAnswersCount[answer.userId].Unfinish;
+                        }
                     });
 
+                    // 計算各狀態的答題數量
                     const trueUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'True').length;
-                    const FalseUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'False').length;
-                    const UnfinishUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'Unfinish').length - 1;
-                    const memberCount = checkroom.Member.length - 1;
-                    const truePercentage = (trueUserAnswersCount / memberCount) * 100;
-                    const FalsePercentage = (FalseUserAnswersCount / memberCount) * 100;
-                    const UnfinishPercentage = (UnfinishUserAnswersCount / memberCount) * 100;
+                    const falseUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'False').length;
+                    const unfinishUserAnswersCount = QUE.userAnswers.filter(answer => answer.state === 'Unfinish').length;
+                    const memberCount = filteredMembers.length; // 使用過濾後的成員數量
+
+                    // 確保不會出現除以零的情況
+                    const truePercentage = memberCount === 0 ? 0 : (trueUserAnswersCount / memberCount) * 100;
+                    const falsePercentage = memberCount === 0 ? 0 : (falseUserAnswersCount / memberCount) * 100;
+                    const unfinishPercentage = memberCount === 0 ? 0 : (unfinishUserAnswersCount / memberCount) * 100;
 
                     QUE.answerCounts = {
                         trueCount: trueUserAnswersCount,
-                        falseCount: FalseUserAnswersCount,
-                        unfinishCount: UnfinishUserAnswersCount,
+                        falseCount: falseUserAnswersCount,
+                        unfinishCount: unfinishUserAnswersCount,
                     };
 
                     QUE.answerPercentages = {
                         truePercentage: truePercentage,
-                        falsePercentage: FalsePercentage,
-                        unfinishPercentage: UnfinishPercentage,
+                        falsePercentage: falsePercentage,
+                        unfinishPercentage: unfinishPercentage,
                     };
 
                     await checkroom.save();
 
                     console.log('True 答案的數量：', trueUserAnswersCount);
-                    console.log('False 答案的數量：', FalseUserAnswersCount);
-                    console.log('Unfinish 答案的數量：', UnfinishUserAnswersCount);
+                    console.log('False 答案的數量：', falseUserAnswersCount);
+                    console.log('Unfinish 答案的數量：', unfinishUserAnswersCount);
                     console.log('True 的百分比：', truePercentage);
-                    console.log('False 的百分比：', FalsePercentage);
-                    console.log('Unfinish 的百分比：', UnfinishPercentage);
-                    console.log('計算 Room 的 答題者數量：', memberCount);
-
+                    console.log('False 的百分比：', falsePercentage);
+                    console.log('Unfinish 的百分比：', unfinishPercentage);
+                    console.log('計算 Room 的成員數量（不包含出題者）：', memberCount);
 
                     io.sockets.to(data.RoomCode).emit('percent', {
                         truePercentage,
                         question
-                    })
-                })
+                    });
+                });
+
+
 
                 socket.on('noqus', function () {
                     console.log("noqus");

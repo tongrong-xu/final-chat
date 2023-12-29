@@ -224,9 +224,7 @@ const userAnswers = async (req, res) => {
             } else {
                 console.log("未找到用戶回答。");
             }
-        } else {
-            console.log("未找到符合的房間。");
-        }
+        } 
     } catch (error) {
         console.log(error.message);
         return res.redirect(`/home`);

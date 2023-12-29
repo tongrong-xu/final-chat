@@ -14,6 +14,7 @@ $(document).ready(function () {
     const userLvElement = document.getElementById('userLv');
     const memberListContainer = document.getElementById('members-con');
     const useridElement = document.getElementById('myid');
+    const userroleElement = document.getElementById('user-role');
 
 
     const fullUrl = window.location.href;
@@ -120,11 +121,18 @@ $(document).ready(function () {
         url: '/home/rooms/classroomData', // 請將路由設置為返回用戶資料的路由
         type: 'GET',
         success: function (data) {
-            // 在這裡處理從後端獲取的資料
             console.log('用戶資料：', data);
             usernameElement.textContent = data.Name ? data.Name : 'name is unknown';
             userLvElement.textContent = data.Lv ? 'Lv.' + data.Lv : 'Lv is unknown';
-            useridElement.value = data.id
+            useridElement.value = data.id;
+            userroleElement.textContent = data.role;
+            if (data.role === "student") {
+                $("#qustion-tab").hide();
+                $("#team-chatroom-tab").hide();
+                $("#qustion").hide();
+                $("#team-chatroom").hide();
+                $("#nowQus-tab").tab('show'); 
+            }
             //---
             var messageObj = {
                 username: data.Name,
@@ -394,16 +402,16 @@ $(document).ready(function () {
                 chatroomCon.scrollTop(43.5 * TMC.length)
             });
             socket.on('RoomMemberOnline', (RMonline) => {
-                memberListContainer.innerHTML = '<p>線上</p>'
+                memberListContainer.innerHTML = `<p>線上 -${RMonline.length}人 </p>`;
                 if (RMonline) {
                     RMonline.forEach(member => {
                         const memberDiv = document.createElement('div');
                         if (data.Name == member.name) {
                             memberDiv.className = 'col row member-username-self-con';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: green;">
+                                <div class="col-3" id="header" style="background-color: darkgreen;">
                                 <img src="#" alt="">
-                            </div>
+                                </div>
                                 <div class="col-3 member-username-self">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
@@ -412,8 +420,8 @@ $(document).ready(function () {
                         } else {
                             memberDiv.className = 'col row';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: green;">
-                                    <img src="#" alt="">
+                                <div class="col-3" id="header" style="background-color: darkgreen;">
+                                <img src="#" alt="">
                                 </div>
                                 <div class="col-3 member-username">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
@@ -429,7 +437,7 @@ $(document).ready(function () {
 
             socket.on('RoomMemberOffline', (RMOffline) => {
                 const Offline = document.createElement('div');
-                Offline.innerHTML = `<p>離線</p>`;
+                Offline.innerHTML = `<p>離線  -${RMOffline.length}人</p>`;
                 memberListContainer.appendChild(Offline)
                 if (RMOffline) {
                     RMOffline.forEach(member => {
@@ -437,8 +445,8 @@ $(document).ready(function () {
                         if (data.Name == member.name) {
                             memberDiv.className = 'col row member-username-self-con';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: green;">
-                                <img src="#" alt="" >
+                                <div class="col-3" id="header" style="background-color: gray;">
+                                <img src="#" alt="">
                                 </div>
                                 <div class="col-3 member-username-self">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
@@ -448,8 +456,8 @@ $(document).ready(function () {
                         } else {
                             memberDiv.className = 'col row';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header">
-                                    <img src="#" alt="">
+                                <div class="col-3" id="header" style="background-color: gray;">
+                                <img src="#" alt="">
                                 </div>
                                 <div class="col-3 member-username">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
