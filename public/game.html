@@ -72,9 +72,8 @@
                             type="button" role="tab" aria-controls="nowQus" aria-selected="false">目前出題</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="team-chatroom-tab" data-bs-toggle="tab"
-                            data-bs-target="#team-chatroom" type="button" role="tab" aria-controls="team-chatroom"
-                            aria-selected="true">房間成員</button>
+                        <button class="nav-link" id="RoomMember-tab" data-bs-toggle="tab" data-bs-target="#RoomMember"
+                            type="button" role="tab" aria-controls="RoomMember" aria-selected="false">房間成員</button>
                     </li>
                 </ul>
                 <!-- ----------------------------題庫---------------------------- -->
@@ -117,6 +116,25 @@
                             </div>
                         </div>
                     </div>
+                    <!-- ----------------------------房間成員---------------------------- -->
+                    <div class="tab-pane fade" id="RoomMember" role="tabpanel" aria-labelledby="RoomMember-tab">
+                        <div style="height: calc(100% - 10px); overflow: auto;">
+                            <div class="qus-inleft-con" style="height: calc(70% - 10px);border: 1px solid;">
+                                <div id="qustion-title">
+                                    成員
+                                </div>
+                                <div class="flex-column board-con-2" id="RoomMemberList">
+
+                                </div>
+                                <div id="qustion-left-bottom">
+                                    <button id="submit-Room-Member-to-Team">自動分組</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
 
                 </div>
             </div>
@@ -151,7 +169,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="team-chatroom-tab" data-bs-toggle="tab" data-bs-target="#team-chatroom"
-                        type="button" role="tab" aria-controls="team-chatroom" aria-selected="true">組員聊天</button>
+                        type="button" role="tab" aria-controls="team-chatroom" aria-selected="false">組員聊天</button>
                 </li>
             </ul>
 
@@ -178,7 +196,9 @@
                 <div class="tab-pane fade show row" id="team-chatroom" role="tabpanel" aria-labelledby="chatroom-tab">
                     <div class="" style="height: calc(100% - 10px);">
                         <div class="flex-column" id="chatroom-con" style="height: auto;">
-                            <div id="teamchat"></div>
+                            <div id="teamchat">
+                                <p>12312312313</p>
+                            </div>
                         </div>
                     </div>
 

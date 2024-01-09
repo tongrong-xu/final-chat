@@ -1,6 +1,38 @@
 $(document).ready(function () {
   const socket = io();
   let Isteacher = false
+  socket.on('connect', function () {
+    socket.emit('QusRoomCode', {
+      RoomCode: RoomCode
+    })
+    socket.on('RoomMemberList', function (members) {
+      // 遍歷每個成員並添加到DOM中
+      console.log(members)
+      members.forEach(member => {
+        CreateRoomMemberDom(member);
+      });
+    });
+    socket.on('playgame', function (data) {
+      let text = convertDataToText(data)
+      var qus = parseFileContent(text)
+      Question(qus)
+      setTimeout(function () {
+        if (!isAnswerCorrect) {
+          console.log('noclick！');
+          options.off("click");
+        }
+      }, 10000);
+      console.log(qus)
+      if (Isteacher) {
+        socket.off('percent'); // 移除之前的監聽器
+        socket.on('percent', function (data) {
+          changeQueueState(topicQuantity, "正確率" + data.truePercentage + "%")
+          console.log('percent', data)
+        });
+      }
+
+    });
+  });
   $.ajax({
     url: '/home/rooms/QSbankData',
     type: 'GET',
@@ -18,6 +50,50 @@ $(document).ready(function () {
     }
   });
 
+  socket.on('groupingResults', function (groups) {
+    displayGroupedMembers(groups);
+  });
+
+  // 顯示分組結果的函數
+  function displayGroupedMembers(groups) {
+    const roomMemberList = $("#RoomMemberList");
+    roomMemberList.empty(); // 清空現有的列表
+
+    groups.forEach(group => {
+      const groupElement = $('<div>').addClass('group');
+
+      // 添加組名
+      const groupName = $('<p>').text(group.groupName);
+      groupElement.append(groupName);
+
+      // 添加每個組員
+      group.members.forEach(member => {
+        const memberElement = CreateRoomMemberDoms(member);
+        groupElement.append(memberElement);
+      });
+
+      roomMemberList.append(groupElement);
+    });
+  }
+
+  // 創建成員 DOM 元素的函數
+  function CreateRoomMemberDoms(member) {
+    // 確保成員資料存在
+    if (!member) {
+      return '';
+    }
+
+    return `
+    <div class="qus-text-con row" style="height:auto">
+    <div class="col row member-username-con member-con">
+        <div class="qus-text col-9">${member.name}</div>
+        <div class="qus-text-state col-3">等級: ${member.Lv}</div>
+        <div id="MemberId" value=${member._id}></div>
+    </div>
+    <hr>
+</div>
+    `;
+  }
 
   let count = 0;
   var qustionQueue = $("#nowQus-con");
@@ -43,6 +119,56 @@ $(document).ready(function () {
 
     return newQusDom;
   }
+
+  function CreateRoomMemberDom(member) {
+    let newMemberDom = `
+        <div class="qus-text-con row" style="height:auto">
+            <div class="col row member-username-con member-con">
+                <div class="qus-text col-9">${member.name}</div>
+                <div class="qus-text-state col-3">等級: ${member.Lv}</div>
+                <div id="MemberId" value=${member._id}></div>
+            </div>
+            <hr>
+        </div>
+    `;
+
+    $("#RoomMemberList").append(newMemberDom);
+    return newMemberDom;
+  }
+
+  // 監聽自動分組按鈕的點擊事件
+  $("#submit-Room-Member-to-Team").click(function () {
+    let members = $("#RoomMemberList .member-username-con");
+    if (members.length < 2) {
+      alert("成員數量不足，無法進行分組。");
+      return;
+    }
+
+    // 從每個成員元素中提取ID
+    let memberIds = members.map(function () {
+      return $(this).find("#MemberId").attr("value");
+    }).get();
+
+    // 向後端發送分組請求
+    socket.emit('requestGrouping', {
+      RoomCode: RoomCode,
+      memberIds: memberIds
+    });
+  });
+
+  // 處理來自後端的分組結果
+  socket.on('groupingResult', function (groups) {
+    // 在這里更新UI以顯示分組結果
+    console.log("分組結果:", groups);
+    displayGroupedMembers(groups); 
+  });
+
+  // 處理分組錯誤
+  socket.on('groupingError', function (message) {
+    alert(message);
+  });
+
+
 
   function changeQueueState(index, state) {
     let queue = $("#nowQus-con");
@@ -357,9 +483,8 @@ $(document).ready(function () {
   let Data = 0;
   let topicQuantity = 0;
   let intervalId;
-  socket.emit('QusRoomCode', {
-    RoomCode: RoomCode
-  })
+
+
   if (!Isteacher) {
     $.ajax({
       url: '/home/rooms/userAnswers',
@@ -509,28 +634,6 @@ $(document).ready(function () {
     nowChooseQus.removeClass("qus-left-con-choose");
   }
 
-  socket.on('connect', function () {
-    socket.on('playgame', function (data) {
-      let text = convertDataToText(data)
-      var qus = parseFileContent(text)
-      Question(qus)
-      setTimeout(function () {
-        if (!isAnswerCorrect) {
-          console.log('noclick！');
-          options.off("click");
-        }
-      }, 10000);
-      console.log(qus)
-      if (Isteacher) {
-        socket.off('percent'); // 移除之前的監聽器
-        socket.on('percent', function (data) {
-          changeQueueState(topicQuantity, "正確率" + data.truePercentage + "%")
-          console.log('percent', data)
-        });
-      }
-
-    });
-  });
   //送出已選取的問題
   submitNewQusToGameBtn.click(SubmitNewQusToGameBtnClick);
 

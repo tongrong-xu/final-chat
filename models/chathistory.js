@@ -6,6 +6,9 @@ const chatMessageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    teams:{
+        type: String,
+    },
     username: String, // 發送者的使用者名稱
     time: String, // 訊息的時間戳記
     content: String // 訊息內容

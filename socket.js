@@ -20,6 +20,46 @@ function ViewRoomCode(viewcode) {
 function Qsname(qsb) {
     qsname = qsb;
 }
+async function createGroups(memberIds) {
+    let shuffledMembers = memberIds.sort(() => 0.5 - Math.random());
+    const totalMembers = shuffledMembers.length;
+    let groupCount = Math.max(2, Math.ceil(totalMembers / 3));
+
+    let groups = [];
+    let remainingMembers = totalMembers;
+
+    for (let i = 0; i < groupCount; i++) {
+        let groupSize = Math.ceil(remainingMembers / (groupCount - i));
+        let groupMemberIds = shuffledMembers.splice(0, groupSize);
+        remainingMembers -= groupSize;
+
+        let groupMembers = await Promise.all(
+            groupMemberIds.map(async memberId => {
+                let memberInfo = await student.findOne({
+                    _id: memberId
+                }, 'name _id Lv').lean();
+                if (!memberInfo) {
+                    return null;
+                }
+                return {
+                    _id: memberInfo._id.toString(), // 將 ObjectId 轉換為字符串
+                    name: memberInfo.name,
+                    Lv: memberInfo.Lv
+                };
+            })
+        );
+
+        // 過濾掉任何 null 的結果
+        groupMembers = groupMembers.filter(member => member !== null);
+
+        groups.push({
+            groupName: `第${i + 1}組`,
+            members: groupMembers // 現在 members 是一個對象數組
+        });
+    }
+
+    return groups;
+}
 
 
 // 主要的 socket 事件處理函式
@@ -117,6 +157,7 @@ const socketOn = function (io, app) {
                     const sortedOnline = Online[data.RoomCode].sort((a, b) => b.Lv - a.Lv);
                     //console.log('Online[data.RoomCode]', Online[data.RoomCode])
                     io.to(data.RoomCode).emit('RoomMemberOnline', sortedOnline);
+                    io.to(data.RoomCode).emit('RoomMemberStudent', studentsOnline)
                     //------offline
 
                     const studentmember = await student.find({
@@ -155,15 +196,39 @@ const socketOn = function (io, app) {
                     })
                 }
             }
-        });
+        })
         //qus
 
         socket.on('QusRoomCode', async function (data) {
             const checkroom = await Room.findOne({
                 RoomCode: data.RoomCode
             });
+            if (checkroom) {
+                // 創建一個數組來儲存學生成員
+                let studentMembers = [];
+
+                // 迭代房間中的每個成員
+                for (let memberId of checkroom.Member) {
+                    // 檢查成員是否是學生
+                    let studentMember = await student.findOne({
+                        _id: memberId
+                    });
+                    if (studentMember) {
+                        // 如果該成員是學生，則添加到列表中
+                        studentMembers.push(studentMember);
+                    }
+                }
+                // 向客戶端發送學生成員列表
+                if (!checkroom.isGrouped)
+                    socket.emit('RoomMemberList', studentMembers)
+                else
+                    socket.emit('groupingResults', checkroom.groups);
+
+            }
             if (checkroom && new Date() <= checkroom.expirationDate) {
                 socket.join(data.RoomCode);
+                if (checkroom.isGrouped == true)
+                    io.to(data.RoomCode).emit('Teams', checkroom.groups);
                 socket.on('dataBata', async function (datas) {
                     io.sockets.to(data.RoomCode).emit('playgame', datas)
                     checkroom.questions.push({
@@ -173,7 +238,7 @@ const socketOn = function (io, app) {
                     })
                     await checkroom.save()
                 });
-              
+
                 socket.on('qusTrue', async function (dataTrue) {
                     console.log("True");
                     const checkroom = await Room.findOne({
@@ -287,11 +352,44 @@ const socketOn = function (io, app) {
                     });
                 });
 
-
-
                 socket.on('noqus', function () {
                     console.log("noqus");
                 });
+
+                socket.on('requestGrouping', async (datas) => {
+                    try {
+                        const checkroom = await Room.findOne({
+                            RoomCode: datas.RoomCode
+                        });
+
+                        // 檢查是否找到了房間
+                        if (!checkroom) {
+                            socket.emit('groupingError', '未找到房間');
+                            return;
+                        }
+
+                        // 檢查是否已經分過組
+                        if (checkroom.isGrouped) {
+                            socket.emit('groupingError', '已經分過組了');
+                            return;
+                        }
+
+                        // 執行分組邏輯
+                        const groups = await createGroups(datas.memberIds);
+                        checkroom.groups = groups;
+                        checkroom.isGrouped = true;
+                        await checkroom.save();
+
+                        // 將分組結果發送給前端
+                        io.to(datas.RoomCode).emit('groupingResult', checkroom.groups);
+                    } catch (error) {
+                        console.error('分組錯誤:', error);
+                        socket.emit('groupingError', '分組過程中發生錯誤');
+                    }
+                });
+
+
+
             }
         });
     });

@@ -127,11 +127,11 @@ $(document).ready(function () {
             useridElement.value = data.id;
             userroleElement.textContent = data.role;
             if (data.role === "student") {
+                // 只顯示學生應該看到的內容
                 $("#qustion-tab").hide();
-                $("#team-chatroom-tab").hide();
+                $("#RoomMember-tab").hide();
                 $("#qustion").hide();
-                $("#team-chatroom").hide();
-                $("#nowQus-tab").tab('show'); 
+                $("#nowQus-tab").tab('show'); // 將"目前出題"設置為默認顯示的標簽頁
             }
             //---
             var messageObj = {
