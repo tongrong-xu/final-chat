@@ -1,8 +1,3 @@
-body {
-    display: flex;
-    justify-content: center;
-}
-
 #bg{
     background-color: antiquewhite;
     padding: 5vh 7vw;

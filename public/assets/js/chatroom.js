@@ -1,3 +1,4 @@
+//chatroom.js
 $(document).ready(function () {
     const messageSendBtn = $("#send-message");
     const messageInput = $("#message-input");
@@ -48,7 +49,7 @@ $(document).ready(function () {
         audio: true,
         video: true
     }
-    myPeer.on('open', id => {
+    /*myPeer.on('open', id => {
         console.log('forpeer', id)
 
         cameraBtn.addEventListener('click', () => {
@@ -114,9 +115,7 @@ $(document).ready(function () {
         console.log('peerID', id)
     else
         console.log('peerIDNot Open')
-
-
-
+*/
     $.ajax({
         url: '/home/rooms/classroomData', // 請將路由設置為返回用戶資料的路由
         type: 'GET',
@@ -153,6 +152,7 @@ $(document).ready(function () {
                     messageInput.val("");
                 }
             });
+
 
             //建立彈幕
             function createBarrage(text, color = "black", type = 0) {
@@ -409,18 +409,18 @@ $(document).ready(function () {
                         if (data.Name == member.name) {
                             memberDiv.className = 'col row member-username-self-con';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: darkgreen;">
+                            <div class="col-3 header header-online">
                                 <img src="#" alt="">
-                                </div>
-                                <div class="col-3 member-username-self">${member.name}</div>
+                            </div>
+                                <div class="col-3 member-username member-username-self">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
                             `;
                             memberListContainer.appendChild(memberDiv);
                         } else {
-                            memberDiv.className = 'col row';
+                            memberDiv.className = 'col row member-con';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: darkgreen;">
+                                <div class="col-3 header header-online" id="header" style="background-color: darkgreen;">
                                 <img src="#" alt="">
                                 </div>
                                 <div class="col-3 member-username">${member.name}</div>
@@ -445,18 +445,18 @@ $(document).ready(function () {
                         if (data.Name == member.name) {
                             memberDiv.className = 'col row member-username-self-con';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: gray;">
+                                <div class="col-3 header header-offline">
                                 <img src="#" alt="">
                                 </div>
-                                <div class="col-3 member-username-self">${member.name}</div>
+                                <div class="col-3 member-username">${member.name}</div>
                                 <div class="col-6 member-lv">Lv.${member.Lv}</div>
                                 <hr>
                             `;
                             memberListContainer.appendChild(memberDiv);
                         } else {
-                            memberDiv.className = 'col row';
+                            memberDiv.className = 'col row member-con';
                             memberDiv.innerHTML = `
-                                <div class="col-3" id="header" style="background-color: gray;">
+                                <div class="col-3 header header-offline">
                                 <img src="#" alt="">
                                 </div>
                                 <div class="col-3 member-username">${member.name}</div>
@@ -470,6 +470,34 @@ $(document).ready(function () {
                     console.log("unknown");
                 }
             });
+            // 在 document.ready 函數內或合適的地方添加事件監聽器來處理組員資訊的更新
+            socket.on('groupMembersInfo', function (data) {
+                const {
+                    onlineMembers,
+                    offlineMembers
+                } = data;
+                console.log("member", data)
+                const memberListContainer = $('#members-con');
+
+                // 清空當前的成員列表
+                memberListContainer.empty();
+
+                // 添加線上成員到列表
+                onlineMembers.forEach(member => {
+                    memberListContainer.append(`<div class="member online">${member.name} (Lv.${member.Lv})</div>`);
+                });
+
+                // 添加離線成員到列表
+                offlineMembers.forEach(member => {
+                    memberListContainer.append(`<div class="member offline">${member.name} (Lv.${member.Lv})</div>`);
+                });
+            });
+
+            // 發送請求組員資訊的請求
+            socket.emit('requestGroupMembers', RoomCode);
+
+
+
             socket.on('disconnect', function () {
                 window.location.href = `/home`;
             });
@@ -592,4 +620,56 @@ $(document).ready(function () {
     }
 
     //---Video
+
+    const chatroomSwitchChannel = $(".switch-chatroom-channel");
+    var nowChannel = 0; //0公開，1組員
+
+    //按下切換後改變頻道，橘色代表組員對話
+    chatroomSwitchChannel.click(function () {
+        if (nowChannel == 0) {
+            nowChannel = 1;
+            messageInput.css("background-color", "orange");
+        } else if (nowChannel == 1) {
+            nowChannel = 0;
+            messageInput.css("background-color", "white");
+        }
+    });
+
+    //-------------------
+
+    // 假設有一個用於切換聊天模式的按鈕或選項
+    // 聊天模式切換處理
+    let chatMode = 'public'; // 預設為公開聊天模式
+    $('#switch-chat-mode').on('click', function () {
+        if (chatMode === 'public') {
+            chatMode = 'group';
+            // 更新 UI，例如將輸入框背景設置為橘色
+            $('#message-input').css('background-color', 'orange');
+        } else {
+            chatMode = 'public';
+            $('#message-input').css('background-color', 'white');
+        }
+    });
+
+    $('#send-message-btn').on('click', function () {
+        let messageContent = $('#message-input').val();
+        if (messageContent) {
+            let messageObj = {
+                RoomCode: currentRoomCode, // 當前房間代碼
+                content: messageContent,
+                username: currentUsername, // 當前用戶名
+                time: new Date().toISOString() // 發送時間
+            };
+
+            // 如果是組內聊天，則需要指定消息的組別
+            if (chatMode === 'group') {
+                messageObj.group = currentUserGroup; // 當前用戶的組別
+            }
+
+            socket.emit('message', messageObj); // 發送消息到服務器
+            $('#message-input').val(''); // 清空輸入框
+        }
+    });
+
+
 });

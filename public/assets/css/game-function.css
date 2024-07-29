@@ -1,6 +1,6 @@
 /* ----------------以下為對話框------------------ */
 
-#chatroom-parent {
+#chatroom-parent{
     background-color: white;
     border-radius: 10px;
     margin: 15px;
@@ -9,65 +9,56 @@
     width: calc(100% - 30px);
 }
 
-#message-con {
+#message-con{
     margin-top: 2px;
     margin-bottom: 2px;
 }
-
-hr {
+hr{
     margin-top: 0px;
     margin-bottom: 2px;
 }
 
-.message-username {
-    font-weight: bold;
+.message-username{
+    font-weight:bold;
     font-size: 13px;
 }
-
-.message-username-self {
-    font-weight: bold;
-    color: #30705D;
+.message-username-self{
+    font-weight:bold;
+    color:#30705D;
     font-size: 13px;
 }
-
-.message-username-self-con {
+.message-username-self-con{
     /* font-weight:bold; */
     /* color:#30705D; */
     background-color: rgb(240, 240, 240);
     /* font-size: 13px; */
 }
-
-.message-time {
+.message-time{
 
     color: gray;
     font-size: 12px;
 }
-
-.message {
+.message{
     /* padding-left: 7px; */
     font-size: 13px;
     padding-bottom: 3px;
 }
-
 /* .tab-content{ */
-/* height: 95%; */
+    /* height: 95%; */
 /* } */
-#chatroom-Tab-Content {
+#chatroom-Tab-Content{
     padding: 5px;
     height: 95%;
 }
-
-#chatroom {
+#chatroom{
     height: 100%;
 }
-
-#chatroom-con {
+#chatroom-con{
     max-height: 100%;
     overflow-y: auto;
     word-break: break-all;
 }
-
-#message-input {
+#message-input{
     width: 100%;
     border-radius: 50px;
     border-style: solid;
@@ -77,8 +68,7 @@ hr {
     padding-right: 13px;
     height: 35px;
 }
-
-.color-btn {
+.color-btn{
     margin-right: 5px;
     border: 1px solid;
     border-radius: 5px;
@@ -86,12 +76,10 @@ hr {
     height: 30px;
     display: flex;
 }
-
-.color-btn:hover {
+.color-btn:hover{
     filter: brightness(0.8);
 }
-
-#down-var {
+#down-var{
     float: right;
 }
 
@@ -107,86 +95,85 @@ hr {
     overflow: hidden;
     z-index: 4;
     pointer-events: none;
-}
+  }
 
 .barrage {
-    font-weight: bold;
+    font-weight:bold;
     position: absolute;
     font-size: 30px;
     /* color: rgb(255, 255, 255); */
     white-space: nowrap;
     z-index: 4;
-    pointer-events: all;
+    pointer-events:all;
     /* -webkit-text-stroke: 1px #000000; */
     text-shadow:
-        1px 1px 0 #000,
-        -1px -1px 0 #000,
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000;
+       1px 1px 0 #000,
+     -1px -1px 0 #000,  
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+       1px 1px 0 #000;
 }
 
 
 /* ------------鏡頭 ---------------*/
-.camera-con {
+.camera-con{
     width: 100%;
     height: 90%;
     flex-wrap: nowrap;
     display: flex;
     overflow-x: auto;
 }
-
-.camera {
+.camera{
     flex: 0 0 15vw;
     width: 18vw;
-    height: calc(100% - 35px);
+    height: calc(100% - 35px );
     background-color: #000;
     opacity: 0.5;
     margin: 15px 15px 20px 15px;
 }
 
 /* -------成員-------- */
-#members-con {
+#members-con{
     max-height: 100%;
     overflow-y: auto;
     word-break: break-all;
     box-sizing: border-box;
 }
-
-#member {
+#member{
     height: 100%;
     box-sizing: border-box;
 }
-
-#header {
+.header{
     width: 25px;
     height: 25px;
     margin-left: 10px;
     margin-right: 10px;
     border-radius: 100px;
 }
-
-.member-con {
+.header-online{
+    background-color:green !important;
+}
+.header-offline{
+    background-color:gray !important;
+}
+.member-con{
     margin-top: 2px;
     margin-bottom: 2px;
     padding-bottom: 2px;
     padding-top: 3px;
     align-items: center;
 }
-
-.member-username {
-    font-weight: bold;
+.member-username{
+    font-weight:bold;
     font-size: 16px;
-
+    
 }
-
-.member-username-self {
-    font-weight: bold !important;
-    color: #30705D !important;
+.member-username-self{
+    font-weight:bold !important; 
+    color:#30705D !important;
     font-size: 16px !important;
 }
-
-.member-username-self-con {
+.member-username-self-con{
     /* font-weight:bold; */
     /* color:#30705D; */
     background-color: rgb(240, 240, 240) !important;
@@ -194,29 +181,27 @@ hr {
     padding-top: 3px !important;
     padding-bottom: 2px !important;
 }
-
-.member-lv {
+.member-lv{
     /* padding-left: 7px; */
     font-size: 14px;
-
+    
 }
 
 /* .member-con{
     padding-top: 3px;
     padding-bottom: 2px;
 } */
-.chatroom-member-hr {
+.chatroom-member-hr{
     margin-bottom: 0px !important;
 }
-
-.chatroom-member-hr-end {
+.chatroom-member-hr-end{
     /* margin-top: 5px; */
     margin-bottom: 20px !important;
 }
 
 /* ----------------以下為左邊題目------------------ */
 
-#qustion-parent {
+#qustion-parent{
     background-color: white;
     border-radius: 10px;
     /* margin: 15px; */
@@ -227,57 +212,48 @@ hr {
     /* width: calc(100% - 30px); */
 }
 
-#message-con {
+#message-con{
     margin-top: 2px;
     margin-bottom: 2px;
 }
-
-hr {
+hr{
     margin-top: 0px;
     margin-bottom: 2px;
 }
-
-.qus-bank {
+.qus-bank{
     cursor: pointer;
     user-select: none;
 }
-
-.qus-left-con {
+.qus-left-con{
     cursor: pointer;
     user-select: none;
 }
-
-.qus-bank-name {
+.qus-bank-name{
     /* padding-left: 7px; */
     font-size: 20px;
     padding-bottom: 3px;
 }
-
-.qus-left-con {
+.qus-left-con{
     /* padding-left: 7px; */
     font-size: 20px;
     padding-bottom: 3px;
 }
-
 /* .tab-content{ */
-/* height: 95%; */
+    /* height: 95%; */
 /* } */
-#qustion-Tab-Content {
+#qustion-Tab-Content{
     padding: 5px;
     height: 95%;
 }
-
-#qustion {
+#qustion{
     height: 100%;
 }
-
-#qustionbank-con {
+#qustionbank-con{
     max-height: calc(100% - 35px);
     overflow-y: auto;
     word-break: break-all;
 }
-
-#message-input {
+#message-input{
     width: 100%;
     border-radius: 50px;
     border-style: solid;
@@ -287,8 +263,7 @@ hr {
     padding-right: 13px;
     height: 35px;
 }
-
-.color-btn {
+.color-btn{
     margin-right: 5px;
     border: 1px solid;
     border-radius: 5px;
@@ -296,64 +271,58 @@ hr {
     height: 30px;
     display: flex;
 }
-
-.color-btn:hover {
+.color-btn:hover{
     filter: brightness(0.8);
 }
-
-#down-var {
+#down-var{
     float: right;
 }
-
-.qus-con {
+.qus-con{
     max-height: 100%;
     overflow-y: auto;
     word-break: break-all;
     display: flex;
     flex-direction: column;
 }
-
-.qusbank-choose {
+.qusbank-choose{
     background-color: rgb(217, 227, 241);
 }
-
-.qus-inleft-parent {
+.qus-inleft-parent{
     max-height: calc(100% - 35px - 36px);
-    height: calc(100% - 35px - 36px);
+    height: calc(100% - 35px  - 36px);
     overflow-y: auto;
     word-break: break-all;
     border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
-
-.qus-name {
+.qus-name{
     font-size: 20px;
 }
-
-.qus-left-con-choose {
+.qus-left-con-choose{
     background-color: rgb(217, 227, 241);
 }
-
-#qustionbank-title {
+#qustionbank-title{
     background-color: whitesmoke;
     font-size: 20px;
     font-weight: 600;
     border-bottom: 1px solid;
     padding: 2px;
 }
-
-#qustion-title {
+#qustion-title{
     background-color: whitesmoke;
     font-size: 20px;
     font-weight: 600;
     border-bottom: 1px solid;
     padding: 2px;
 }
-
-#qustion-left-bottom {
+#qustion-left-bottom{
     width: 100%;
     display: flex;
     flex-direction: row-reverse;
     padding: 3px;
     /* position: absolute; */
     bottom: 0;
+}
+.switch-chatroom-channel{
+    margin-left: 5px;
+
 }

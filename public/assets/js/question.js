@@ -13,26 +13,34 @@ $(document).ready(function () {
       });
     });
     socket.on('playgame', function (data) {
+      maxHealth = data.maxHealth; // 從後端接收的最大血量
+      currentHealth = maxHealth; // 初始化當前血量
+      window.LetBossAppear(); // 顯示 Boss
       let text = convertDataToText(data)
       var qus = parseFileContent(text)
       Question(qus)
+      $(".qus-con").show();
       setTimeout(function () {
         if (!isAnswerCorrect) {
           console.log('noclick！');
           options.off("click");
         }
-      }, 10000);
+      }, 25000);
       console.log(qus)
-      if (Isteacher) {
-        socket.off('percent'); // 移除之前的監聽器
-        socket.on('percent', function (data) {
+      socket.off('percent'); // 移除之前的監聽器
+      socket.on('percent', function (data) {
+        if (Isteacher) {
           changeQueueState(topicQuantity, "正確率" + data.truePercentage + "%")
-          console.log('percent', data)
-        });
-      }
-
+        }
+        console.log('percent', data)
+      });
+      socket.on('reduceHealth', function (data) {
+        console.log("reduceHealth")
+        window.ChangeBossHP(-data);
+      });
     });
   });
+
   $.ajax({
     url: '/home/rooms/QSbankData',
     type: 'GET',
@@ -160,7 +168,7 @@ $(document).ready(function () {
   socket.on('groupingResult', function (groups) {
     // 在這里更新UI以顯示分組結果
     console.log("分組結果:", groups);
-    displayGroupedMembers(groups); 
+    displayGroupedMembers(groups);
   });
 
   // 處理分組錯誤
@@ -286,8 +294,8 @@ $(document).ready(function () {
           data: data[0],
           id: useridElement.value,
           state: 'Unfinish'
-        })
-      }, 10000);
+        });
+      }, 25000);
     }
   }
 
@@ -552,15 +560,6 @@ $(document).ready(function () {
   }
   qusInLeftParent.on("click", ".qus-left-con", qusLeftConClick);
 
-  function sendDataToClients(num, dataBata) {
-    if (Data < num) {
-      socket.emit('dataBata', dataBata[Data]);
-      Data++;
-    } else {
-      Data = 0;
-    }
-  }
-
 
   function convertDataToText(data) {
     topicQuantity++;
@@ -614,16 +613,8 @@ $(document).ready(function () {
       data: JSON.stringify(requestData),
       contentType: 'application/json',
       success: function (response) {
-        console.log('後端：', response.topicview);
-
-        intervalId = setInterval(function () {
-          sendDataToClients(response.topicview.length, response.topicview);
-          isAnswerCorrect = false
-          if (Data == response.topicview.length) {
-            clearInterval(intervalId);
-            socket.emit('noqus')
-          }
-        }, 12000);
+        dataBata = response.topicview; // 假設返回的數據是在response.topicview中
+        startQuestioning(dataBata); // 開始出題流程
       },
       error: function (error) {
         console.error('錯：', error);
@@ -636,5 +627,67 @@ $(document).ready(function () {
 
   //送出已選取的問題
   submitNewQusToGameBtn.click(SubmitNewQusToGameBtnClick);
+
+
+  //------
+  let currentQuestionIndex = 0; // 當前題目索引
+  let dataBata; // 儲存從後端獲取的題目數據
+  const questionDuration = 30000; // 每題的持續時間（30秒）
+  const animationDuration = 10000; // 動畫的持續時間（10秒）
+  const firstQuestionDelay = 5000;
+  // 在遊戲開始時調用此函數以開始出題邏輯
+  function startQuestioning() {
+    if (dataBata.length > 0) {
+
+      setTimeout(() => {
+
+        handleQuestion();
+
+
+      }, firstQuestionDelay);
+    }
+  }
+  socket.on('win', function () {
+    window.PaintWinOrLoseText("win");
+    setTimeout(() => {
+      window.resetBossScene();
+    }, 8500);
+  })
+  socket.on('lose', function () {
+    window.PaintWinOrLoseText("lose");
+    setTimeout(() => {
+      window.resetBossScene();
+    }, 8500);
+  })
+
+  function handleQuestion() {
+    window.resetBossScene();
+    if (currentQuestionIndex < dataBata.length) {
+      const data = dataBata[currentQuestionIndex];
+      socket.emit('dataBata', data); // 向客戶端發送當前題目數據
+
+      // 設置30秒後的處理，用於結束當前問題的作答時間
+      setTimeout(() => {
+        setTimeout(() => {
+          currentQuestionIndex++; // 更新題目索引
+          if (currentQuestionIndex < dataBata.length) {
+            handleQuestion(); // 遞歸調用處理下一題
+          } else {
+            console.log('All questions have been handled.');
+            window.resetBossScene();
+            dataBata = [];
+            currentQuestionIndex = 0;
+          }
+        }, animationDuration);
+        window.resetBossScene();
+      }, questionDuration);
+
+    } else {
+      // 所有題目都已處理完畢
+      console.log('All questions have been handled.');
+      window.resetBossScene();
+    }
+  }
+
 
 });

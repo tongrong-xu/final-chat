@@ -152,10 +152,7 @@ $(document).ready(function(){
         }
     });
 
-    const socket = io();
-    socket.on('connection', function () {
-        console.log('A user connected');
-    })
+   
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get('message');
 

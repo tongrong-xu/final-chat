@@ -126,6 +126,17 @@ $(document).ready(function(){
 
     //-------------------------以上為UI折疊--------------------------
 
+    QusConShow(false);
+    
+    //隱藏顯示qus欄位，有題目才顯示
+    function QusConShow(show = true){
+        if(show == true){
+            $(".qus-con").show();
+        }
+        else{
+            $(".qus-con").hide();
+        }
+    }
 
     //-----------------------設定--------------------
     const settingCon = $(".setting-con");

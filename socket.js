@@ -137,6 +137,48 @@ const socketOn = function (io, app) {
                             }
                         });
                     }
+
+                    //member
+                    // 於 socket.js 中新增一個事件監聽器來處理組員資訊的請求
+                    socket.on('requestGroupMembers', async (roomId) => {
+                        const room = await Room.findOne({
+                            RoomCode: roomId
+                        });
+                        if (!room || !room.groups || room.groups.length === 0) {
+                            socket.emit('groupMembersError', '找不到組員資訊或該房間未進行分組');
+                            return;
+                        }
+
+                        // 假設每個成員都有一個唯一的 ID，並且當前用戶的 ID 已知
+                        const currentUserGroupId = room.groups.find(group => group.members.some(member => member._id === socket.userId))?.groupName;
+
+                        if (!currentUserGroupId) {
+                            socket.emit('groupMembersError', '找不到當前用戶的組別');
+                            return;
+                        }
+
+                        // 過濾出當前用戶組的成員
+                        const currentGroupMembers = room.groups.find(group => group.groupName === currentUserGroupId).members;
+
+                        // 根據 Online 和 Offline 數組過濾出線上和離線的組員
+                        const onlineMembers = currentGroupMembers.filter(member => Online[roomId].some(onlineUser => onlineUser._id === member._id));
+                        const offlineMembers = currentGroupMembers.filter(member => !Online[roomId].some(onlineUser => onlineUser._id === member._id));
+
+                        // 將組員資訊發送回客戶端
+                        console.log('Sending groupMembersInfo', {
+                            onlineMembers,
+                            offlineMembers
+                        });
+                        socket.emit('groupMembersInfo', {
+                            onlineMembers,
+                            offlineMembers
+                        });
+
+                    });
+
+
+                    //
+
                     // online
                     Member[data.RoomCode] = Member[data.RoomCode] || [];
                     Online[data.RoomCode] = Online[data.RoomCode] || [];
@@ -158,6 +200,7 @@ const socketOn = function (io, app) {
                     //console.log('Online[data.RoomCode]', Online[data.RoomCode])
                     io.to(data.RoomCode).emit('RoomMemberOnline', sortedOnline);
                     io.to(data.RoomCode).emit('RoomMemberStudent', studentsOnline)
+
                     //------offline
 
                     const studentmember = await student.find({
@@ -175,6 +218,20 @@ const socketOn = function (io, app) {
                         return !Online[data.RoomCode].some(onlineMember => onlineMember.name === member.name);
                     });
                     io.to(data.RoomCode).emit('RoomMemberOffline', Offline[data.RoomCode]);
+
+                    // socket event handling
+                    socket.on('message', async function (message) {
+                        // 檢查消息是否指定了組別
+                        if (message.group) {
+                            // 只向同一組的成員發送消息
+                            // 假設 `group` 字段包含了組別標識
+                            socket.to(message.group).emit('receive', message);
+                        } else {
+                            // 向房間內所有人發送消息
+                            socket.to(message.RoomCode).emit('receive', message);
+                        }
+                    });
+
 
                     socket.on('disconnect', function () {
                         const userIndex = Online[data.RoomCode].findIndex(user => user.name === data.myName);
@@ -240,10 +297,16 @@ const socketOn = function (io, app) {
                 });
 
                 socket.on('qusTrue', async function (dataTrue) {
-                    console.log("True");
                     const checkroom = await Room.findOne({
                         RoomCode: data.RoomCode
                     });
+                    const memberCount = checkroom.Member.length; // 假設每個房間成員都有資格回答
+                    const correctAnswers = checkroom.questions.reduce((acc, cur) => {
+                        return acc + (cur.userAnswers.some(answer => answer.state === 'True') ? 1 : 0);
+                    }, 0);
+                    const hp = 1000 / (memberCount - 1);
+                    io.sockets.to(data.RoomCode).emit('reduceHealth', hp);
+
                     const QUE = checkroom.questions[checkroom.questions.length - 1];
                     QUE.userAnswers.push({
                         userId: dataTrue.id,
@@ -345,6 +408,17 @@ const socketOn = function (io, app) {
                     console.log('False 的百分比：', falsePercentage);
                     console.log('Unfinish 的百分比：', unfinishPercentage);
                     console.log('計算 Room 的成員數量（不包含出題者）：', memberCount);
+
+                    const correctRate = memberCount > 0 ? (trueUserAnswersCount / memberCount) * 100 : 0;
+                    console.log(`答對率: ${correctRate}%`);
+
+                    if (correctRate >= 70) {
+                        console.log('應該發送win事件');
+                        io.sockets.to(data.RoomCode).emit('win');
+                    } else {
+                        console.log('應該發送lose事件');
+                        io.sockets.to(data.RoomCode).emit('lose');
+                    }
 
                     io.sockets.to(data.RoomCode).emit('percent', {
                         truePercentage,
